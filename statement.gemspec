@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Derek Willis"]
   spec.email         = ["dwillis@gmail.com"]
   spec.description   = %q{Crawls congressional websites for press releases.}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.summary       = %q{Given a url, Statement returns links to press releases and official statements.}
   spec.homepage      = ""
   spec.license       = "Apache"
 

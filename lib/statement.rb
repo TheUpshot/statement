@@ -1,6 +1,7 @@
 require "statement/version"
 require 'uri'
 require 'open-uri'
+require 'american_date'
 
 module Statement
   
