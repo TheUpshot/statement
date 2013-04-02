@@ -2,6 +2,7 @@ require "statement/version"
 require 'uri'
 require 'open-uri'
 require 'american_date'
+require 'nokogiri'
 
 module Statement
   
@@ -12,7 +13,7 @@ module Statement
       date = Date.parse(uri.query.split('=').last)
       doc = Nokogiri::HTML(open(url).read)
       links = doc.xpath("//ul[@id='membernews']").search('a')
-      links.map{|link| {:source => source, :url => link["href"], :title => link.text.strip, :date => date, :domain => URI.parse(link["href"]).host}}
+      links.map{|link| {:source => url, :url => link["href"], :title => link.text.strip, :date => date, :domain => URI.parse(link["href"]).host}}
     end
     
   end
