@@ -12,4 +12,9 @@ describe Statement do
     @results.first[:source].must_equal "http://www.gop.gov/republicans/news?offset=03/29/13"
   end
   
+  it "does not attempt to parse dates when none are present" do
+    @results = Statement::Link.from_rss("http://culberson.house.gov/feed/rss/")
+    @results.first[:date].must_equal nil
+  end
+  
 end
