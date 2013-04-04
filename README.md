@@ -24,6 +24,12 @@ Or install it yourself as:
     results = Statement::Link.house_gop('http://www.gop.gov/republicans/news?offset=03/29/11')
     puts results.first
     {:source=>"http://www.gop.gov/republicans/news?offset=03/29/11", :url=>"http://poe.house.gov/News/DocumentSingle.aspx?DocumentID=233004", :title=>"Poe: War in the Name of Humanity", :date=> <Date: 2011-03-29 ((2455650j,0s,0n),+0s,2299161j)>, :domain=>"poe.house.gov"}
+    
+## Tests
+
+Statement uses MiniTest, to run tests:
+
+    rake test
 
 ## Contributing
 
