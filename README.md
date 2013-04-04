@@ -1,6 +1,6 @@
 # Statement
 
-TODO: Write a gem description
+Statement parses RSS feeds and HTML pages containing press releases and other official statements from members of Congress, and produces hashes with information about those pages.
 
 ## Installation
 
@@ -18,7 +18,12 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+    require 'rubygems'
+    require 'statement'
+    
+    results = Statement::Link.house_gop('http://www.gop.gov/republicans/news?offset=03/29/11')
+    puts results.first
+    {:source=>"http://www.gop.gov/republicans/news?offset=03/29/11", :url=>"http://poe.house.gov/News/DocumentSingle.aspx?DocumentID=233004", :title=>"Poe: War in the Name of Humanity", :date=> <Date: 2011-03-29 ((2455650j,0s,0n),+0s,2299161j)>, :domain=>"poe.house.gov"}
 
 ## Contributing
 
