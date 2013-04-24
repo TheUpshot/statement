@@ -39,6 +39,7 @@ module Statement
       results << capuano
       results << crenshaw
       results << conaway
+      results << susandavis
       results
     end
     
