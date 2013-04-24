@@ -34,6 +34,25 @@ module Statement
       end
     end
     
+    ## special cases for members without RSS feeds
+    
+    def self.capuano
+      results = []
+      base_url = "http://www.house.gov/capuano/news/"
+      list_url = base_url + 'date.shtml'
+      doc = Nokogiri::HTML(open(list_url).read)
+      doc.xpath("//a").each do |link|
+        if link['href'] and link['href'].include?('/pr')
+          puts link.text
+          begin 
+            date = Date.parse(link.text) 
+          rescue 
+            date = nil 
+          end
+          results << { :source => list_url, :url => base_url + link['href'], :title => link.text.split(' ',2).last, :date => date, :domain => "http://www.house.gov/capuano/" }
+        end
+      end
+      return results[0..-5]
+    end
   end
-  
 end
