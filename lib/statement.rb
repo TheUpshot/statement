@@ -34,6 +34,14 @@ module Statement
       end
     end
     
+    def self.from_scrapers
+      results = []
+      results << capuano
+      results << crenshaw
+      results << conaway
+      results
+    end
+    
     ## special cases for members without RSS feeds
     
     def self.capuano
@@ -66,6 +74,29 @@ module Statement
         next if date_text == 'Date'
         date = Date.parse(date_text)
         results << { :source => url, :url => row.children[2].children.first['href'], :title => title, :date => date, :domain => "crenshaw.house.gov" }
+      end
+      results
+    end
+    
+    def self.conaway(page=1)
+      results = []
+      base_url = "http://conaway.house.gov/news/"
+      page_url = base_url + "documentquery.aspx?DocumentTypeID=1279&Page=#{page}"
+      doc = Nokogiri::HTML(open(page_url).read)
+      doc.xpath("//tr")[1..-1].each do |row|
+        results << { :source => page_url, :url => base_url + row.children.children[1]['href'], :title => row.children.children[1].text.strip, :date => Date.parse(row.children.children[4].text), :domain => "conaway.house.gov" }
+      end
+      results
+    end
+    
+    def self.susandavis
+      results = []
+      base_url = "http://www.house.gov/susandavis/"
+      doc = Nokogiri::HTML(open(base_url+'news.shtml').read)
+      doc.search("ul")[6].children.each do |row|
+        next if row.text.strip == ''
+        puts row.children[1]['href']
+        results << { :source => base_url+'news.shtml', :url => base_url + row.children[1]['href'], :title => row.children[1].text.split.join(' '), :date => Date.parse(row.children.first.text), :domain => "house.gov/susandavis" }
       end
       results
     end
