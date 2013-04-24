@@ -47,12 +47,29 @@ module Statement
           begin 
             date = Date.parse(link.text) 
           rescue 
-            date = nil 
+            date = nil
           end
-          results << { :source => list_url, :url => base_url + link['href'], :title => link.text.split(' ',2).last, :date => date, :domain => "http://www.house.gov/capuano/" }
+          results << { :source => list_url, :url => base_url + link['href'], :title => link.text.split(' ',2).last, :date => date, :domain => "www.house.gov/capuano/" }
         end
       end
       return results[0..-5]
     end
+    
+    def self.crenshaw(year, month)
+      results = []
+      year = Date.today.year if not year
+      month = 0 if not month
+      url = "http://crenshaw.house.gov/index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
+      doc = Nokogiri::HTML(open(url).read)
+      doc.xpath("//tr")[2..-1].each do |row|
+        date_text, title = row.children.map{|c| c.text.strip}.reject{|c| c.empty?}
+        next if date_text == 'Date'
+        date = Date.parse(date_text)
+        results << { :source => url, :url => row.children[2].children.first['href'], :title => title, :date => date, :domain => "crenshaw.house.gov" }
+      end
+      results
+    end
+    
+    
   end
 end
