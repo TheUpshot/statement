@@ -37,7 +37,7 @@ module Statement
     def self.from_scrapers
       results = []
       results << capuano
-      results << crenshaw
+      results << crenshaw(2013, 0)
       results << conaway
       results << susandavis
       results
@@ -52,7 +52,6 @@ module Statement
       doc = Nokogiri::HTML(open(list_url).read)
       doc.xpath("//a").each do |link|
         if link['href'] and link['href'].include?('/pr')
-          puts link.text
           begin 
             date = Date.parse(link.text) 
           rescue 
@@ -96,7 +95,6 @@ module Statement
       doc = Nokogiri::HTML(open(base_url+'news.shtml').read)
       doc.search("ul")[6].children.each do |row|
         next if row.text.strip == ''
-        puts row.children[1]['href']
         results << { :source => base_url+'news.shtml', :url => base_url + row.children[1]['href'], :title => row.children[1].text.split.join(' '), :date => Date.parse(row.children.first.text), :domain => "house.gov/susandavis" }
       end
       results
