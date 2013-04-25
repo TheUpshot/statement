@@ -35,17 +35,8 @@ module Statement
     end
     
     def self.from_scrapers
-      results = []
-      results << freshman_senators
-      results << capuano
-      results << crenshaw(2013, 0)
-      results << conaway
-      results << susandavis
-      results << faleomavaega
-      results << klobuchar
-      results << lujan
-      results << billnelson(year=2013)
-      results.flatten
+      [freshman_senators, capuano, crenshaw(2013, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, billnelson(year=2013), 
+        billnelson(year=2012), roe(page=1), roe(page=2), roe(page=3)].flatten
     end
     
     ## special cases for members without RSS feeds
@@ -170,10 +161,19 @@ module Statement
       doc.xpath("//span[@class='middlecopy']").each do |row|
         results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1532&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip.gsub(/[\x80-\xff]/,''), :date => Date.parse(row.children[4].text.gsub(/[\x80-\xff]/,'').strip), :domain => "roe.house.gov" }
       end
-      
-      
+      results
     end
     
+    def self.thornberry(page=1)
+      results = []
+      base_url = "http://thornberry.house.gov/news/"
+      doc = Nokogiri::HTML(open(base_url+"documentquery.aspx?DocumentTypeID=1776&Page=#{page}").read)
+      doc.xpath("//span[@class='middlecopy']").each do |row|
+        results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1776&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip.gsub(/[\x80-\xff]/,''), :date => Date.parse(row.children[4].text.gsub(/[\x80-\xff]/,'').strip), :domain => "thornberry.house.gov" }
+      end
+      results
+      
+    end
     
   end
 end
