@@ -42,6 +42,9 @@ module Statement
       results << conaway
       results << susandavis
       results << faleomavaega
+      results << klobuchar
+      results << lujan
+      results << billnelson(year=2013)
       results.flatten
     end
     
@@ -114,7 +117,7 @@ module Statement
     
     def self.freshman_senators
       results = []
-      ['baldwin', 'donnelly', 'flake', 'hirono','heinrich','scott','king','heitkamp','cruz','kaine'].each do |senator|
+      ['baldwin', 'donnelly', 'flake', 'hirono','heinrich','murphy','scott','king','heitkamp','cruz','kaine'].each do |senator|
         base_url = "http://www.#{senator}.senate.gov/"
         doc = Nokogiri::HTML(open(base_url+'press.cfm?maxrows=200&startrow=1&&type=1').read)
         doc.xpath("//tr")[3..-1].each do |row|
@@ -148,6 +151,18 @@ module Statement
       end
       results
     end
+    
+    def self.billnelson(year=2013)
+      results = []
+      base_url = "http://www.billnelson.senate.gov/news/"
+      year_url = base_url + "media.cfm?year=#{year}"
+      doc = Nokogiri::HTML(open(year_url).read)
+      doc.xpath('//li').each do |row|
+        results << { :source => year_url, :url => base_url + row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.children.last.text).to_s, :domain => "billnelson.senate.gov" }
+      end
+      results
+    end
+    
     
   end
 end
