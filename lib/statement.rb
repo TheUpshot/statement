@@ -138,5 +138,16 @@ module Statement
       results
     end
     
+    def self.lujan
+      results = []
+      base_url = 'http://lujan.house.gov/'
+      doc = Nokogiri::HTML(open(base_url+'index.php?option=com_content&view=article&id=981&Itemid=78').read)
+      doc.xpath('//ul')[1].children.each do |row|
+        next if row.text.strip == ''
+        results << { :source => base_url+'index.php?option=com_content&view=article&id=981&Itemid=78', :url => base_url + row.children[0]['href'], :title => row.children[0].text.gsub(/[\x80-\xff]/,'').gsub('Lujn','Lujan'), :date => nil, :domain => "lujan.house.gov" }
+      end
+      results
+    end
+    
   end
 end
