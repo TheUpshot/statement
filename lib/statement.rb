@@ -100,6 +100,16 @@ module Statement
       results
     end
     
+    def self.faleomavaega
+      results = []
+      base_url = "http://www.house.gov/faleomavaega/news-press.shtml"
+      doc = Nokogiri::HTML(open(base_url).read)
+      doc.xpath("//li[@type='disc']").each do |row|
+        results << { :source => base_url, :url => "http://www.house.gov/" + row.children[0]['href'], :title => row.children[0].text.gsub(/[\x80-\xff]/,'').split('Washington, D.C.').last, :date => Date.parse(row.children[1].text.gsub(/[\x80-\xff]/,' ')), :domain => "house.gov/faleomavaega" }
+      end
+      results
+    end
+    
     def self.freshman_senators
       results = []
       ['baldwin', 'donnelly', 'flake', 'hirono','heinrich','scott','king','heitkamp','cruz','kaine'].each do |senator|
