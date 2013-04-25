@@ -36,10 +36,12 @@ module Statement
     
     def self.from_scrapers
       results = []
+      results << freshman_senators
       results << capuano
       results << crenshaw(2013, 0)
       results << conaway
       results << susandavis
+      results << faleomavaega
       results.flatten
     end
     
@@ -121,6 +123,19 @@ module Statement
         end
       end
       results.flatten
+    end
+    
+    def self.klobuchar
+      results = []
+      base_url = "http://www.klobuchar.senate.gov/"
+      [2012,2013].each do |year|
+        year_url = base_url + "newsreleases.cfm?year=#{year}"
+        doc = Nokogiri::HTML(open(year_url).read)
+        doc.xpath("//dt").each do |row|
+          results << { :source => year_url, :url => base_url + row.next.children[0]['href'], :title => row.next.text.strip.gsub(/[\x80-\xff]/,'').split.join(' '), :date => Date.parse(row.text), :domain => "klobuchar.senate.gov" }
+        end
+      end
+      results
     end
     
   end
