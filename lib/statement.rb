@@ -36,7 +36,7 @@ module Statement
     
     def self.from_scrapers
       [freshman_senators, capuano, crenshaw(2013, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, billnelson(year=2013), 
-        billnelson(year=2012), roe(page=1), roe(page=2), roe(page=3)].flatten
+        billnelson(year=2012), roe(page=1), roe(page=2), roe(page=3), thornberry(page=1), thornberry(page=2), thornberry(page=3)].flatten
     end
     
     ## special cases for members without RSS feeds
@@ -172,7 +172,6 @@ module Statement
         results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1776&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip.gsub(/[\x80-\xff]/,''), :date => Date.parse(row.children[4].text.gsub(/[\x80-\xff]/,'').strip), :domain => "thornberry.house.gov" }
       end
       results
-      
     end
     
   end
