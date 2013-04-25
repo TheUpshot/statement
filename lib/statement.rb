@@ -40,7 +40,7 @@ module Statement
       results << crenshaw(2013, 0)
       results << conaway
       results << susandavis
-      results
+      results.flatten
     end
     
     ## special cases for members without RSS feeds
@@ -100,6 +100,18 @@ module Statement
       results
     end
     
+    def self.freshman_senators
+      results = []
+      ['baldwin', 'donnelly', 'flake', 'hirono','heinrich','scott','king','heitkamp','cruz','kaine'].each do |senator|
+        base_url = "http://www.#{senator}.senate.gov/"
+        doc = Nokogiri::HTML(open(base_url+'press.cfm?maxrows=200&startrow=1&&type=1').read)
+        doc.xpath("//tr")[3..-1].each do |row|
+          next if row.text.strip == ''
+          results << { :source => base_url+'press.cfm?maxrows=200&startrow=1&&type=1', :url => base_url + row.children.children[1]['href'], :title => row.children.children[1].text.strip.split.join(' '), :date => Date.parse(row.children.children[0].text.gsub(/[\x80-\xff]/,'')), :domain => "#{senator}.senate.gov" }
+        end
+      end
+      results.flatten
+    end
     
   end
 end
