@@ -163,6 +163,17 @@ module Statement
       results
     end
     
+    def self.roe(page=1)
+      results = []
+      base_url = "http://roe.house.gov/news/"
+      doc = Nokogiri::HTML(open(base_url+"documentquery.aspx?DocumentTypeID=1532&Page=#{page}").read)
+      doc.xpath("//span[@class='middlecopy']").each do |row|
+        results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1532&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip.gsub(/[\x80-\xff]/,''), :date => Date.parse(row.children[4].text.gsub(/[\x80-\xff]/,'').strip), :domain => "roe.house.gov" }
+      end
+      
+      
+    end
+    
     
   end
 end
