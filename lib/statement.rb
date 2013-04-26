@@ -1,3 +1,4 @@
+# encoding: utf-8
 require "statement/version"
 require 'uri'
 require 'open-uri'
