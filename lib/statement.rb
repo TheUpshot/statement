@@ -139,7 +139,7 @@ module Statement
       doc = Nokogiri::HTML(open(base_url+'index.php?option=com_content&view=article&id=981&Itemid=78').read)
       doc.xpath('//ul')[1].children.each do |row|
         next if row.text.strip == ''
-        #results << { :source => base_url+'index.php?option=com_content&view=article&id=981&Itemid=78', :url => base_url + row.children[0]['href'], :title => row.children[0].text.gsub(/[\x80-\xff]/,'').gsub('Lujn','Lujan'), :date => nil, :domain => "lujan.house.gov" }
+        results << { :source => base_url+'index.php?option=com_content&view=article&id=981&Itemid=78', :url => base_url + row.children[0]['href'], :title => row.children[0].text, :date => nil, :domain => "lujan.house.gov" }
       end
       results
     end
@@ -150,7 +150,7 @@ module Statement
       year_url = base_url + "media.cfm?year=#{year}"
       doc = Nokogiri::HTML(open(year_url).read)
       doc.xpath('//li').each do |row|
-        #results << { :source => year_url, :url => base_url + row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.children.last.text).to_s, :domain => "billnelson.senate.gov" }
+        results << { :source => year_url, :url => base_url + row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.children.last.text).to_s, :domain => "billnelson.senate.gov" }
       end
       results
     end
@@ -160,7 +160,7 @@ module Statement
       base_url = "http://roe.house.gov/news/"
       doc = Nokogiri::HTML(open(base_url+"documentquery.aspx?DocumentTypeID=1532&Page=#{page}").read)
       doc.xpath("//span[@class='middlecopy']").each do |row|
-        #results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1532&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip.gsub(/[\x80-\xff]/,''), :date => Date.parse(row.children[4].text.gsub(/[\x80-\xff]/,'').strip), :domain => "roe.house.gov" }
+        results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1532&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[4].text.strip), :domain => "roe.house.gov" }
       end
       results
     end
@@ -170,7 +170,7 @@ module Statement
       base_url = "http://thornberry.house.gov/news/"
       doc = Nokogiri::HTML(open(base_url+"documentquery.aspx?DocumentTypeID=1776&Page=#{page}").read)
       doc.xpath("//span[@class='middlecopy']").each do |row|
-        #results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1776&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip.gsub(/[\x80-\xff]/,''), :date => Date.parse(row.children[4].text.gsub(/[\x80-\xff]/,'').strip), :domain => "thornberry.house.gov" }
+        results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1776&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[4].text.strip), :domain => "thornberry.house.gov" }
       end
       results
     end
