@@ -102,7 +102,7 @@ module Statement
       base_url = "http://www.house.gov/faleomavaega/news-press.shtml"
       doc = Nokogiri::HTML(open(base_url).read)
       doc.xpath("//li[@type='disc']").each do |row|
-        results << { :source => base_url, :url => "http://www.house.gov/" + row.children[0]['href'], :title => row.children[0].text.gsub(REGEX,'').split('Washington, D.C.').last, :date => Date.parse(row.children[1].text.gsub("[\x80-\xff]".force_encoding('UTF-8'),'')), :domain => "house.gov/faleomavaega" }
+        results << { :source => base_url, :url => "http://www.house.gov/" + row.children[0]['href'], :title => row.children[0].text.gsub(/[u201cu201d]/, '').split('Washington, D.C.').last, :date => Date.parse(row.children[1].text), :domain => "house.gov/faleomavaega" }
       end
       results
     end
@@ -114,7 +114,7 @@ module Statement
         doc = Nokogiri::HTML(open(base_url+'press.cfm?maxrows=200&startrow=1&&type=1').read)
         doc.xpath("//tr")[3..-1].each do |row|
           next if row.text.strip == ''
-          #results << { :source => base_url+'press.cfm?maxrows=200&startrow=1&&type=1', :url => base_url + row.children.children[1]['href'], :title => row.children.children[1].text.strip.split.join(' '), :date => Date.parse(row.children.children[0].text.gsub(/[\x80-\xff]/,'')), :domain => "#{senator}.senate.gov" }
+          results << { :source => base_url+'press.cfm?maxrows=200&startrow=1&&type=1', :url => base_url + row.children.children[1]['href'], :title => row.children.children[1].text.strip.split.join(' '), :date => Date.parse(row.children.children[0].text), :domain => "#{senator}.senate.gov" }
         end
       end
       results.flatten
@@ -127,7 +127,7 @@ module Statement
         year_url = base_url + "newsreleases.cfm?year=#{year}"
         doc = Nokogiri::HTML(open(year_url).read)
         doc.xpath("//dt").each do |row|
-          #results << { :source => year_url, :url => base_url + row.next.children[0]['href'], :title => row.next.text.strip.gsub(/[\x80-\xff]/,'').split.join(' '), :date => Date.parse(row.text), :domain => "klobuchar.senate.gov" }
+          results << { :source => year_url, :url => base_url + row.next.children[0]['href'], :title => row.next.text.strip.gsub(/[u201cu201d]/, '').split.join(' '), :date => Date.parse(row.text), :domain => "klobuchar.senate.gov" }
         end
       end
       results
