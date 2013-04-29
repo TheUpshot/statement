@@ -60,19 +60,28 @@ module Statement
       return results[0..-5]
     end
     
-    def self.crenshaw(year, month)
+    def self.cold_fusion(year, month)
       results = []
       year = Date.today.year if not year
       month = 0 if not month
-      url = "http://crenshaw.house.gov/index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
-      doc = Nokogiri::HTML(open(url).read)
-      doc.xpath("//tr")[2..-1].each do |row|
-        date_text, title = row.children.map{|c| c.text.strip}.reject{|c| c.empty?}
-        next if date_text == 'Date'
-        date = Date.parse(date_text)
-        results << { :source => url, :url => row.children[2].children.first['href'], :title => title, :date => date, :domain => "crenshaw.house.gov" }
+      domains = ['crenshaw.house.gov/', 'www.ronjohnson.senate.gov/public/','www.lee.senate.gov/public/','www.hoeven.senate.gov/public/']
+      domains.each do |domain|
+        if domain == 'crenshaw.house.gov/'
+          url = "http://"+domain + "index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
+        elsif domain == 'www.hoeven.senate.gov/public/'
+          url = "http://"+domain + "index.cfm/news-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
+        else
+          url = "http://"+domain + "index.cfm/press-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
+        end
+        doc = Nokogiri::HTML(open(url).read)
+        doc.xpath("//tr")[2..-1].each do |row|
+          date_text, title = row.children.map{|c| c.text.strip}.reject{|c| c.empty?}
+          next if date_text == 'Date' or date_text.size > 8
+          date = Date.parse(date_text)
+          results << { :source => url, :url => row.children[2].children.first['href'], :title => title, :date => date, :domain => domain }
+        end
       end
-      results
+      results.flatten
     end
     
     def self.conaway(page=1)
@@ -155,24 +164,16 @@ module Statement
       results
     end
     
-    def self.roe(page=1)
+    def self.document_query(page=1)
       results = []
-      base_url = "http://roe.house.gov/news/"
-      doc = Nokogiri::HTML(open(base_url+"documentquery.aspx?DocumentTypeID=1532&Page=#{page}").read)
-      doc.xpath("//span[@class='middlecopy']").each do |row|
-        results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1532&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[4].text.strip), :domain => "roe.house.gov" }
+      domains = [{"roe.house.gov" => 1532}, {"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}]
+      domains.each do |domain|
+        doc = Nokogiri::HTML(open("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}").read)
+        doc.xpath("//span[@class='middlecopy']").each do |row|
+          results << { :source => "http://"+domain.keys.first+"/news/"+"documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}", :url => "http://"+domain.keys.first+"/news/" + row.children[6]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[4].text.strip), :domain => domain.keys.first }
+        end
       end
-      results
-    end
-    
-    def self.thornberry(page=1)
-      results = []
-      base_url = "http://thornberry.house.gov/news/"
-      doc = Nokogiri::HTML(open(base_url+"documentquery.aspx?DocumentTypeID=1776&Page=#{page}").read)
-      doc.xpath("//span[@class='middlecopy']").each do |row|
-        results << { :source => base_url+"documentquery.aspx?DocumentTypeID=1776&Page=#{page}", :url => base_url + row.children[6]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[4].text.strip), :domain => "thornberry.house.gov" }
-      end
-      results
+      results.flatten
     end
     
   end
