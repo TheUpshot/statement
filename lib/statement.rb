@@ -36,8 +36,12 @@ module Statement
     end
     
     def self.from_scrapers
-      [freshman_senators, capuano, crenshaw(2013, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, billnelson(year=2013), 
-        billnelson(year=2012), roe(page=1), roe(page=2), roe(page=3), thornberry(page=1), thornberry(page=2), thornberry(page=3)].flatten
+      [freshman_senators, capuano, cold_fusion(2013, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, billnelson(year=2013), 
+        document_query(page=1), document_query(page=2), lautenberg, crapo].flatten
+    end
+    
+    def self.backfill_from_scrapers
+      [cold_fusion(2012, 0), cold_fusion(2011, 0), billnelson(year=2012), document_query(page=3), document_query(page=4)].flatten
     end
     
     ## special cases for members without RSS feeds
@@ -64,11 +68,11 @@ module Statement
       results = []
       year = Date.today.year if not year
       month = 0 if not month
-      domains = ['crenshaw.house.gov/', 'www.ronjohnson.senate.gov/public/','www.lee.senate.gov/public/','www.hoeven.senate.gov/public/']
+      domains = ['crenshaw.house.gov/', 'www.ronjohnson.senate.gov/public/','www.lee.senate.gov/public/','www.hoeven.senate.gov/public/','www.moran.senate.gov/public/','www.risch.senate.gov/public/']
       domains.each do |domain|
-        if domain == 'crenshaw.house.gov/'
+        if domain == 'crenshaw.house.gov/' or domain == 'www.risch.senate.gov/public/'
           url = "http://"+domain + "index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
-        elsif domain == 'www.hoeven.senate.gov/public/'
+        elsif domain == 'www.hoeven.senate.gov/public/' or domain == 'www.moran.senate.gov/public/'
           url = "http://"+domain + "index.cfm/news-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
         else
           url = "http://"+domain + "index.cfm/press-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
@@ -159,7 +163,30 @@ module Statement
       year_url = base_url + "media.cfm?year=#{year}"
       doc = Nokogiri::HTML(open(year_url).read)
       doc.xpath('//li').each do |row|
-        results << { :source => year_url, :url => base_url + row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.children.last.text).to_s, :domain => "billnelson.senate.gov" }
+        results << { :source => year_url, :url => base_url + row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.children.last.text), :domain => "billnelson.senate.gov" }
+      end
+      results
+    end
+    
+    # fetches the latest 1000 releases, can be altered
+    def self.lautenberg(rows=1000)
+      results = []
+      base_url = 'http://www.lautenberg.senate.gov/newsroom/'
+      url = base_url + "releases.cfm?maxrows=#{rows}&startrow=1&&type=1"
+      doc = Nokogiri::HTML(open(url).read)
+      doc.xpath("//tr")[4..-2].each do |row|
+        results << { :source => url, :url => base_url + row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip), :domain => "lautenberg.senate.gov" }
+      end
+      results
+    end
+    
+    def self.crapo
+      results = []
+      base_url = "http://www.crapo.senate.gov/media/newsreleases/"
+      url = base_url + "release_all.cfm"
+      doc = Nokogiri::HTML(open(url).read)
+      doc.xpath("//tr").each do |row|
+        results << { :source => url, :url => base_url + row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip.gsub('-','/')), :domain => "crapo.senate.gov" }
       end
       results
     end
