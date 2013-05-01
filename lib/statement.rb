@@ -36,12 +36,17 @@ module Statement
     end
     
     def self.from_scrapers
-      [freshman_senators, capuano, cold_fusion(2013, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, billnelson(year=2013), 
-        document_query(page=1), document_query(page=2), lautenberg, crapo].flatten
+      year = Date.today.year
+      [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, billnelson(year=year), 
+        document_query(page=1), document_query(page=2), lautenberg, crapo, coburn, boxer(start=1), mccain(year=year), 
+        vitter_cowan(year=year), inhofe(year=year)].flatten
     end
     
     def self.backfill_from_scrapers
-      [cold_fusion(2012, 0), cold_fusion(2011, 0), billnelson(year=2012), document_query(page=3), document_query(page=4)].flatten
+      [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3), 
+        document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21), 
+        boxer(start=31), boxer(start=41), mccain(year=2012), mccain(year=2011), vitter_cowan(year=2012), vitter_cowan(year=2011),
+        ].flatten
     end
     
     ## special cases for members without RSS feeds
@@ -187,6 +192,65 @@ module Statement
       doc = Nokogiri::HTML(open(url).read)
       doc.xpath("//tr").each do |row|
         results << { :source => url, :url => base_url + row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip.gsub('-','/')), :domain => "crapo.senate.gov" }
+      end
+      results
+    end
+    
+    def self.coburn(year=Date.today.year)
+      results = []
+      url = "http://www.coburn.senate.gov/public/index.cfm?p=PressReleases&ContentType_id=d741b7a7-7863-4223-9904-8cb9378aa03a&Group_id=7a55cb96-4639-4dac-8c0c-99a4a227bd3a&MonthDisplay=0&YearDisplay=#{year}"
+      doc = Nokogiri::HTML(open(url).read)
+      doc.xpath("//tr")[2..-1].each do |row|
+        next if row.text[0..3] == "Date"
+        results << { :source => url, :url => row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip), :domain => "coburn.senate.gov" }
+      end
+      results
+    end
+    
+    def self.boxer(start=1)
+      results = []
+      url = "http://www.boxer.senate.gov/en/press/releases.cfm?start=#{start}"
+      domain = 'www.boxer.senate.gov'
+      doc = Nokogiri::HTML(open(url).read)
+      doc.xpath("//div[@class='left']")[1..-1].each do |row|
+        results << { :source => url, :url => domain + row.next.next.children[1].children[0]['href'], :title => row.next.next.children[1].children[0].text, :date => Date.parse(row.text.strip), :domain => domain}
+      end
+      results
+    end
+    
+    def self.mccain(year=Date.today.year)
+      results = []
+      url = "http://www.mccain.senate.gov/public/index.cfm?FuseAction=PressOffice.PressReleases&ContentRecordType_id=75e7e4a0-6088-44b6-8061-089d80513dc4&Region_id=&Issue_id=&MonthDisplay=0&YearDisplay=#{year}"
+      domain = 'www.mccain.senate.gov'
+      doc = Nokogiri::HTML(open(url).read)
+      doc.xpath("//li")[7..-1].each do |row|
+        results << { :source => url, :url => domain + row.children[3].children[1].children[4].children[0]['href'], :title => row.children[3].children[1].children[4].text, :date => Date.parse(row.children[3].children[1].children[0].text), :domain => domain}
+      end
+      results
+    end
+    
+    def self.vitter_cowan(year=Date.today.year)
+      results = []
+      urls = ["http://www.vitter.senate.gov/newsroom/", "http://www.cowan.senate.gov/"]
+      urls.each do |url|
+        next if year < 2013 and url == "http://www.cowan.senate.gov/"
+        domain = url == "http://www.vitter.senate.gov/newsroom/" ? "www.vitter.senate.gov" : "www.cowan.senate.gov"
+        doc = Nokogiri::HTML(open(url+"press?year=#{year}").read)
+        doc.xpath("//tr")[1..-1].each do |row|
+          next if row.text.strip.size < 30
+          results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.parse(row.children[0].text), :domain => domain}
+        end
+      end
+      results.flatten
+    end
+    
+    def self.inhofe(year=Date.today.year)
+      results = []
+      url = "http://www.inhofe.senate.gov/newsroom/press-releases?year=#{year}"
+      domain = "www.inhofe.senate.gov"
+      doc = Nokogiri::HTML(open(url).read)
+      doc.xpath("//tr")[1..-1].each do |row|
+        results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.parse(row.children[0].text), :domain => domain}
       end
       results
     end
