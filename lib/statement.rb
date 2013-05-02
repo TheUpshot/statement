@@ -39,7 +39,7 @@ module Statement
       year = Date.today.year
       [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, billnelson(year=year), 
         document_query(page=1), document_query(page=2), lautenberg, crapo, coburn, boxer(start=1), mccain(year=year), 
-        vitter_cowan(year=year), inhofe(year=year)].flatten
+        vitter_cowan(year=year), inhofe(year=year), reid].flatten
     end
     
     def self.backfill_from_scrapers
@@ -251,6 +251,28 @@ module Statement
       doc = Nokogiri::HTML(open(url).read)
       doc.xpath("//tr")[1..-1].each do |row|
         results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.parse(row.children[0].text), :domain => domain}
+      end
+      results
+    end
+    
+    def self.levin(page=1)
+      results = []
+      url = "http://www.levin.senate.gov/newsroom/index.cfm?PageNum_rs=#{page}&section=press"
+      domain = "www.levin.senate.gov"
+      doc = Nokogiri::HTML(open(url).read)
+      doc.xpath('//tr').each do |row|
+        results << { :source => url, :url => row.children[2].children[0]['href'].gsub(/\s+/, ""), :title => row.children[2].children[0].text, :date => Date.parse(row.children[0].text), :domain => domain}
+      end
+      results
+    end
+    
+    def self.reid
+      results = []
+      url = "http://www.reid.senate.gov/newsroom/press_releases.cfm"
+      domain = "www.reid.senate.gov"
+      doc = Nokogiri::HTML(open(url).read)
+      doc.xpath("//table[@id='CS_PgIndex_21891_21893']//tr")[1..-1].each do |row|
+        results << { :source => url, :url => "http://www.reid.senate.gov"+row.children[0].children[0]['href'], :title => row.children[0].children[0].text, :date => Date.parse(row.children[0].children[2].text), :domain => domain}
       end
       results
     end
