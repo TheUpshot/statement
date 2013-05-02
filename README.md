@@ -1,6 +1,6 @@
 # Statement
 
-Statement parses RSS feeds and HTML pages containing press releases and other official statements from members of Congress, and produces hashes with information about those pages.
+Statement parses RSS feeds and HTML pages containing press releases and other official statements from members of Congress, and produces hashes with information about those pages. It has been tested under Ruby 1.9.2 and 1.9.3.
 
 ## Coverage
 
