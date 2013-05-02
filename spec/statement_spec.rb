@@ -39,4 +39,22 @@ describe Statement do
     @results.last[:url].must_equal "http://www.billnelson.senate.gov/news/details.cfm?id=338190&"
   end
   
+  it "scrapes vitter and cowan pages for 2013" do
+    @vitter = "http://www.vitter.senate.gov/newsroom/press?year=2013"
+    @cowan = "http://www.cowan.senate.gov/press?year=2013"
+    stub_request(:any, @vitter).to_return(:body => File.new(File.join(File.dirname(__FILE__), 'vitter_press.html')), :status => 200)
+    stub_request(:any, @cowan).to_return(:body => File.new(File.join(File.dirname(__FILE__), 'cowan_press.html')), :status => 200)
+    @results = Statement::Link.vitter_cowan(year=2013)
+    @results.map{|r| r[:domain]}.uniq.must_equal ["www.vitter.senate.gov", "www.cowan.senate.gov"]
+  end
+  
+  it "only scrapes vitter page for 2012" do
+    @vitter = "http://www.vitter.senate.gov/newsroom/press?year=2012"
+    @cowan = "http://www.cowan.senate.gov/press?year=2012"
+    stub_request(:any, @vitter).to_return(:body => File.new(File.join(File.dirname(__FILE__), 'vitter_press.html')), :status => 200)
+    stub_request(:any, @cowan).to_return(:body => File.new(File.join(File.dirname(__FILE__), 'cowan_press.html')), :status => 200)
+    @results = Statement::Link.vitter_cowan(year=2012)
+    @results.map{|r| r[:domain]}.uniq.must_equal ["www.vitter.senate.gov"]    
+  end
+  
 end
