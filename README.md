@@ -32,9 +32,9 @@ $ gem install statement
 require 'rubygems'
 require 'statement'
     
-results = Statement::Link.house_gop('http://www.gop.gov/republicans/news?offset=03/29/11')
+results = Statement::Link.from\_rss('http://blumenauer.house.gov/index.php?option=com\_bca-rss-syndicator&feed_id=1')
 puts results.first
-{:source=>"http://www.gop.gov/republicans/news?offset=03/29/11", :url=>"http://poe.house.gov/News/DocumentSingle.aspx?DocumentID=233004", :title=>"Poe: War in the Name of Humanity", :date=> <Date: 2011-03-29 ((2455650j,0s,0n),+0s,2299161j)>, :domain=>"poe.house.gov"}
+{:source=>"http://blumenauer.house.gov/index.php?option=com_bca-rss-syndicator&feed_id=1", :url=>"http://blumenauer.house.gov/index.php?option=com_content&amp;view=article&amp;id=2203:blumenauer-qwe-need-a-national-system-that-speaks-to-the-transportation-challenges-of-todayq&amp;catid=66:2013-press-releases", :title=>"Blumenauer: &quot;We need a national system that speaks to the transportation challenges of ...", :date=>#<Date: 2013-04-24 ((2456407j,0s,0n),+0s,2299161j)>, :domain=>"blumenauer.house.gov"}
 ```
 
 ## Tests
