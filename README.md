@@ -4,7 +4,7 @@ Statement parses RSS feeds and HTML pages containing press releases and other of
 
 ## Coverage
 
-Statement currently parses press releases for the 535 members of the House and Senate, mostly via RSS feeds but some via HTML scrapers. Congressional committees that have RSS feeds are currently included, as are methods for speciality groups, such as House Republicans. Suggestions are welcomed.
+Statement currently parses press releases for members of the House and Senate. For members with RSS feeds, you can pass the feed URL into Statement. For members without RSS feeds, HTML scrapers are provided, as are methods for speciality groups, such as House Republicans. Suggestions are welcomed.
 
 ## Installation
 
