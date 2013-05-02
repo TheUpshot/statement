@@ -2,6 +2,10 @@
 
 Statement parses RSS feeds and HTML pages containing press releases and other official statements from members of Congress, and produces hashes with information about those pages.
 
+## Coverage
+
+Statement currently parses press releases for the 535 members of the House and Senate, mostly via RSS feeds but some via HTML scrapers. Congressional committees that have RSS feeds are currently included, as are methods for speciality groups, such as House Republicans. Suggestions are welcomed.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -48,6 +52,8 @@ $ rake test
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+If you write a new scraper, please use Nokogiri for parsing - see some of the existing examples for guidance. The ``domain`` attribute represents the URI base domain of the source site.
 
 ## Authors
 
