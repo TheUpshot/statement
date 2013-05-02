@@ -31,4 +31,12 @@ describe Statement do
     @results = Statement::Link.house_gop(@feed_url)
     @results.last[:url].must_equal "http://www.gop.gov/republicans/other/relative_url_test.html"
   end
+  
+  it "scrapes a senate cold fusion page" do
+    @url = "http://www.billnelson.senate.gov/news/media.cfm?year=2013"
+    stub_request(:any, @url).to_return(:body => File.new(File.join(File.dirname(__FILE__), 'bill_nelson_press.html')), :status => 200)
+    @results = Statement::Link.billnelson(year=2013)
+    @results.last[:url].must_equal "http://www.billnelson.senate.gov/news/details.cfm?id=338190&"
+  end
+  
 end
