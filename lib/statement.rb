@@ -19,7 +19,7 @@ module Statement
       links = doc.xpath('//item')
       links.map do |link| 
         abs_link = absolute_link(url, link.xpath('link').text)
-        { :source => url, :url => abs_link, :title => link.xpath('title').text, :date => link.xpath('pubDate').empty? ? nil: Date.parse(link.xpath('pubDate').text), :domain => URI.parse(link.xpath('link').text).host }
+        { :source => url, :url => abs_link, :title => link.xpath('title').text, :date => link.xpath('pubDate').first.text.empty? ? nil: Date.parse(link.xpath('pubDate').text), :domain => URI.parse(link.xpath('link').text).host }
       end
     end
     
