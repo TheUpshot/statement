@@ -64,7 +64,7 @@ module Statement
     
     def self.from_scrapers
       year = Date.today.year
-      [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, billnelson(year=year), 
+      [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), lautenberg, crapo, coburn, boxer(start=1), mccain(year=year), 
         vitter_cowan(year=year), inhofe(year=year), reid].flatten
     end
@@ -319,6 +319,18 @@ module Statement
       return if doc.nil?
       doc.xpath("//table[@id='CS_PgIndex_21891_21893']//tr")[1..-1].each do |row|
         results << { :source => url, :url => "http://www.reid.senate.gov"+row.children[0].children[0]['href'], :title => row.children[0].children[0].text, :date => Date.parse(row.children[0].children[2].text), :domain => domain}
+      end
+      results
+    end
+    
+    def self.palazzo(page=1)
+      results = []
+      domain = "palazzo.house.gov"
+      url = "http://palazzo.house.gov/news/documentquery.aspx?DocumentTypeID=2519&Page=#{page}"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//div[@class='middlecopy']//li").each do |row|
+        results << { :source => url, :url => "http://palazzo.house.gov/news/" + row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain }
       end
       results
     end
