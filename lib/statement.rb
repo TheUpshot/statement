@@ -30,7 +30,7 @@ module Statement
     end
     
     def self.date_from_rss_item(link)
-      if !link.xpath('pubDate').text.blank?
+      if !link.xpath('pubDate').text.empty?
         Date.parse(link.xpath('pubDate').text)
       elsif !link.xpath('pubdate').empty?
         Date.parse(link.xpath('pubdate').text)
