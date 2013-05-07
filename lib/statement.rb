@@ -28,6 +28,16 @@ module Statement
         nil
       end
     end
+    
+    def self.date_from_rss_item(item)
+      if !item.xpath('pubDate').empty?
+        Date.parse(link.xpath('pubdate').text)
+      elsif !item.xpath('pubdate').empty?
+        Date.parse(link.xpath('pubDate').text)
+      else
+        nil
+      end
+    end
 
     def self.from_rss(url)
       doc = open_rss(url)
@@ -36,7 +46,7 @@ module Statement
       links.map do |link|
         abs_link = absolute_link(url, link.xpath('link').text)
         abs_link = "http://www.burr.senate.gov/public/"+ link.xpath('link').text if url == 'http://www.burr.senate.gov/public/index.cfm?FuseAction=RSS.Feed'
-        { :source => url, :url => abs_link, :title => link.xpath('title').text, :date => link.xpath('pubDate').empty? ? nil: Date.parse(link.xpath('pubDate').text), :domain => URI.parse(link.xpath('link').text).host }
+        { :source => url, :url => abs_link, :title => link.xpath('title').text, :date => date_from_rss_item(link), :domain => URI.parse(url).host }
       end
     end
     
