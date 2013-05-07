@@ -65,7 +65,7 @@ module Statement
     def self.from_scrapers
       year = Date.today.year
       [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
-        document_query(page=1), document_query(page=2), lautenberg, crapo, coburn, boxer(start=1), mccain(year=year), 
+        document_query(page=1), document_query(page=2), donnelly(year=year), lautenberg, crapo, coburn, boxer(start=1), mccain(year=year), 
         vitter_cowan(year=year), inhofe(year=year), reid].flatten
     end
     
@@ -159,9 +159,10 @@ module Statement
     
     def self.freshman_senators
       results = []
-      ['baldwin', 'donnelly', 'flake', 'hirono','heinrich','murphy','scott','king','heitkamp','cruz','kaine'].each do |senator|
+      ['baldwin', 'flake', 'hirono','heinrich','murphy','scott','king','heitkamp','cruz','kaine'].each do |senator|
+        puts senator
         base_url = "http://www.#{senator}.senate.gov/"
-        doc = open_html(base_url+'press.cfm?maxrows=200&startrow=1&&type=1')
+        doc = Statement::Link.open_html(base_url+'press.cfm?maxrows=200&startrow=1&&type=1')
         return if doc.nil?
         doc.xpath("//tr")[3..-1].each do |row|
           next if row.text.strip == ''
@@ -270,12 +271,16 @@ module Statement
       results
     end
     
-    def self.vitter_cowan(year=Date.today.year)
+    def self.vitter_cowan_donnelly(year=Date.today.year)
       results = []
       urls = ["http://www.vitter.senate.gov/newsroom/", "http://www.cowan.senate.gov/"]
       urls.each do |url|
         next if year < 2013 and url == "http://www.cowan.senate.gov/"
-        domain = url == "http://www.vitter.senate.gov/newsroom/" ? "www.vitter.senate.gov" : "www.cowan.senate.gov"
+        if url == "http://www.vitter.senate.gov/newsroom/"
+          domain = "www.vitter.senate.gov"
+        elsif url == "http://www.cowan.senate.gov/"
+          domain = "www.cowan.senate.gov"
+        end
         doc = open_html(url+"press?year=#{year}")
         return if doc.nil?
         doc.xpath("//tr")[1..-1].each do |row|
@@ -284,6 +289,19 @@ module Statement
         end
       end
       results.flatten
+    end
+    
+    def self.donnelly(year=Date.today.year)
+      results = []
+      url = "http://www.donnelly.senate.gov/newsroom/press?year=2013"
+      domain = "www.donnelly.senate.gov"
+      doc = open_html(url+"press?year=#{year}")
+      return if doc.nil?
+      doc.xpath("//tr")[1..-1].each do |row|
+        next if row.text.strip.size < 30
+        results << { :source => url, :url => "http://www.donnelly.senate.gov"+row.children[2].children[1]['href'].strip, :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text), :domain => domain}
+      end
+      results
     end
     
     def self.inhofe(year=Date.today.year)
