@@ -160,7 +160,6 @@ module Statement
     def self.freshman_senators
       results = []
       ['baldwin', 'flake', 'hirono','heinrich','murphy','scott','king','heitkamp','cruz','kaine'].each do |senator|
-        puts senator
         base_url = "http://www.#{senator}.senate.gov/"
         doc = Statement::Link.open_html(base_url+'press.cfm?maxrows=200&startrow=1&&type=1')
         return if doc.nil?
@@ -271,7 +270,7 @@ module Statement
       results
     end
     
-    def self.vitter_cowan_donnelly(year=Date.today.year)
+    def self.vitter_cowan(year=Date.today.year)
       results = []
       urls = ["http://www.vitter.senate.gov/newsroom/", "http://www.cowan.senate.gov/"]
       urls.each do |url|
@@ -293,7 +292,7 @@ module Statement
     
     def self.donnelly(year=Date.today.year)
       results = []
-      url = "http://www.donnelly.senate.gov/newsroom/press?year=2013"
+      url = "http://www.donnelly.senate.gov/newsroom/"
       domain = "www.donnelly.senate.gov"
       doc = open_html(url+"press?year=#{year}")
       return if doc.nil?
