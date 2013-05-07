@@ -29,11 +29,11 @@ module Statement
       end
     end
     
-    def self.date_from_rss_item(item)
-      if !item.xpath('pubDate').empty?
-        Date.parse(link.xpath('pubdate').text)
-      elsif !item.xpath('pubdate').empty?
+    def self.date_from_rss_item(link)
+      if !link.xpath('pubDate').empty?
         Date.parse(link.xpath('pubDate').text)
+      elsif !link.xpath('pubdate').empty?
+        Date.parse(link.xpath('pubdate').text)
       else
         nil
       end
