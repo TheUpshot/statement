@@ -10,7 +10,7 @@ module Statement
   class Link
     def self.absolute_link(url, link)
       return link if link =~ /^http:\/\//
-      (URI.parse(url).host + "/"+link).to_s
+      ("http://"+URI.parse(url).host + "/"+link).to_s
     end
     
     def self.open_rss(url)
