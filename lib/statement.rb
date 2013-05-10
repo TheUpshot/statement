@@ -77,6 +77,40 @@ module Statement
         ].flatten
     end
     
+    ## special cases for committees without RSS feeds
+    
+    def self.senate_approps
+      results = []
+      url = "http://www.appropriations.senate.gov/news.cfm"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//div[@class='newsDateUnderlined']").each do |date|
+        date.next.next.children.reject{|c| c.text.strip.empty?}.each do |row|
+          results << { :source => url, :url => url + row.children[0]['href'], :title => row.text, :date => Date.parse(date.text), :domain => "http://www.appropriations.senate.gov/" }
+        end
+      end
+      results
+    end
+    
+    def self.senate_banking(year)
+      results = []
+      url = "http://www.banking.senate.gov/public/index.cfm?FuseAction=Newsroom.PressReleases&ContentRecordType_id=b94acc28-404a-4fc6-b143-a9e15bf92da4&Region_id=&Issue_id=&MonthDisplay=0&YearDisplay=#{year}"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//tr").each do |row|
+        results << { :source => url, :url => "http://www.banking.senate.gov/public/" + row.children[2].children[1]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip+", #{year}"), :domain => "http://www.banking.senate.gov/" }
+      end
+      results
+    end
+    
+    def self.senate_hsag(year)
+      url = "http://www.hsgac.senate.gov/media/majority-media?year=#{year}"
+      doc = open_html(url)
+      return if doc.nil?
+      
+      
+    end
+    
     ## special cases for members without RSS feeds
     
     def self.capuano
