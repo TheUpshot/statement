@@ -24,6 +24,15 @@ describe Statement do
     @results = Statement::Link.from_rss(@feed_url)
     @results.first[:date].must_equal nil
   end
+  
+  it "parses invalid RSS" do
+    @feed_url = "http://www.burr.senate.gov/public/index.cfm?FuseAction=RSS.Feed"
+    stub_request(:any, @feed_url).to_return(:body => File.new(File.join(File.dirname(__FILE__), "richard_burr.xml")), :status => 200)
+    
+    @results = Statement::Link.from_rss(@feed_url)
+    @results.first[:url].must_equal "http://www.burr.senate.gov/public/index.cfm?FuseAction=PressOffice.PressReleases&Type=Press Release&ContentRecord_id=65dbea38-d64c-6208-ef8f-2b000e899b3a"
+    @results.first[:date].to_s.must_equal "2013-05-02"
+  end
 
   it "handles relative URLs" do
     @feed_url = "http://www.gop.gov/republicans/news?offset=03/29/13"
