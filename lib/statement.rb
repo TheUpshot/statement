@@ -77,16 +77,36 @@ module Statement
         ].flatten
     end
     
+    def self.committee_scrapers
+      year = Date.today.year
+      [senate_approps_majority, senate_approps_minority, senate_banking(year), senate_hsag_majority(year), senate_hsag_minority(year),
+         senate_indian, senate_aging, senate_smallbiz_minority, senate_intel(113, 2013, 2014), house_energy_minority, house_homeland_security_minority,
+         house_judiciary_majority, house_rules_majority, house_ways_means_majority].flatten
+    end
+    
     ## special cases for committees without RSS feeds
     
-    def self.senate_approps
+    def self.senate_approps_majority
       results = []
       url = "http://www.appropriations.senate.gov/news.cfm"
       doc = open_html(url)
       return if doc.nil?
       doc.xpath("//div[@class='newsDateUnderlined']").each do |date|
         date.next.next.children.reject{|c| c.text.strip.empty?}.each do |row|
-          results << { :source => url, :url => url + row.children[0]['href'], :title => row.text, :date => Date.parse(date.text), :domain => "http://www.appropriations.senate.gov/" }
+          results << { :source => url, :url => url + row.children[0]['href'], :title => row.text, :date => Date.parse(date.text), :domain => "http://www.appropriations.senate.gov/", :party => 'majority' }
+        end
+      end
+      results
+    end
+    
+    def self.senate_approps_minority
+      results = []
+      url = "http://www.appropriations.senate.gov/republican.cfm"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//div[@class='newsDateUnderlined']").each do |date|
+        date.next.next.children.reject{|c| c.text.strip.empty?}.each do |row|
+          results << { :source => url, :url => url + row.children[0]['href'], :title => row.text, :date => Date.parse(date.text), :domain => "http://www.appropriations.senate.gov/", :party => 'minority' }
         end
       end
       results
@@ -98,17 +118,135 @@ module Statement
       doc = open_html(url)
       return if doc.nil?
       doc.xpath("//tr").each do |row|
-        results << { :source => url, :url => "http://www.banking.senate.gov/public/" + row.children[2].children[1]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip+", #{year}"), :domain => "http://www.banking.senate.gov/" }
+        results << { :source => url, :url => "http://www.banking.senate.gov/public/" + row.children[2].children[1]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip+", #{year}"), :domain => "http://www.banking.senate.gov/", :party => 'majority' }
       end
       results
     end
     
-    def self.senate_hsag(year)
+    def self.senate_hsag_majority(year)
+      results = []
       url = "http://www.hsgac.senate.gov/media/majority-media?year=#{year}"
       doc = open_html(url)
       return if doc.nil?
-      
-      
+      doc.xpath("//tr").each do |row|
+        next if row.text.strip.size < 30
+        results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].children[0].text, :date => Date.parse(row.children[0].text), :domain => "http://www.hsgac.senate.gov/", :party => 'majority' }
+      end
+      results
+    end
+    
+    def self.senate_hsag_minority(year)
+      results = []
+      url = "http://www.hsgac.senate.gov/media/minority-media?year=#{year}"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//tr").each do |row|
+        next if row.text.strip.size < 30
+        results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].children[0].text, :date => Date.parse(row.children[0].text), :domain => "http://www.hsgac.senate.gov/", :party => 'minority' }
+      end
+      results
+    end
+    
+    def self.senate_indian
+      results = []
+      url = "http://www.indian.senate.gov/news/index.cfm"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//ol[@class='contentList pressRelease']").each do |row|
+        results << { :source => url, :url => "http://www.indian.senate.gov"+row.children[0].children[1].children[3].children[0]['href'], :title => row.children[0].children[1].children[3].children[0].text, :date => Date.parse(row.children[0].children[1].children[1].text), :domain => "http://www.hsgac.senate.gov/", :party => 'majority' }
+      end
+      results
+    end
+    
+    def self.senate_aging
+      results = []
+      url = "http://www.aging.senate.gov/pressroom.cfm?maxrows=100&startrow=1&&type=1"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//tr")[6..104].each do |row|
+        results << { :source => url, :url => "http://www.aging.senate.gov/"+row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text), :domain => "http://www.aging.senate.gov/" }
+      end
+      results
+    end
+    
+    def self.senate_smallbiz_minority
+      results = []
+      url = "http://www.sbc.senate.gov/public/index.cfm?p=RepublicanPressRoom"
+      doc = open_html(url)
+      return if doc.nil?      
+      doc.xpath("//ul[@class='recordList']").each do |row|
+        results << { :source => url, :url => row.children[0].children[2].children[0]['href'], :title => row.children[0].children[2].children[0].text, :date => Date.parse(row.children[0].children[0].text), :domain => "http://www.sbc.senate.gov/", :party => 'minority' }
+      end
+      results
+    end
+    
+    def self.senate_intel(congress, start_year, end_year)
+      results = []
+      url = "http://www.intelligence.senate.gov/press/releases.cfm?congress=#{congress}&y1=#{start_year}&y2=#{end_year}"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//tr[@valign='top']")[7..-1].each do |row|
+        results << { :source => url, :url => "http://www.intelligence.senate.gov/press/"+row.children[2].children[0]['href'], :title => row.children[2].children[0].text.strip, :date => Date.parse(row.children[0].text), :domain => "http://www.intelligence.senate.gov/" }
+      end
+      results
+    end
+    
+    def self.house_energy_minority
+      results = []
+      url = "http://democrats.energycommerce.house.gov/index.php?q=news-releases"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//div[@class='views-field-title']").each do |row|
+        results << { :source => url, :url => "http://democrats.energycommerce.house.gov"+row.children[1].children[0]['href'], :title => row.children[1].children[0].text, :date => Date.parse(row.next.next.text.strip), :domain => "http://energycommerce.house.gov/", :party => 'minority' }
+      end
+      results
+    end
+    
+    def self.house_homeland_security_minority
+      results = []
+      url = "http://chsdemocrats.house.gov/press/index.asp?subsection=1"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//li[@class='article']").each do |row|
+        results << { :source => url, :url => "http://chsdemocrats.house.gov"+row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[3].text), :domain => "http://chsdemocrats.house.gov/", :party => 'minority' }
+      end
+      results
+    end
+    
+    def self.house_judiciary_majority
+      results = []
+      url = "http://judiciary.house.gov/news/press2013.html"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//p")[3..60].each do |row|
+        next if row.text.size < 30
+        results << { :source => url, :url => row.children[5]['href'], :title => row.children[0].text, :date => Date.parse(row.children[1].text.strip), :domain => "http://judiciary.house.gov/", :party => 'majority' }
+      end
+      results
+    end
+    
+    def self.house_rules_majority
+      results = []
+      url = "http://www.rules.house.gov/News/Default.aspx"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//tr")[1..-2].each do |row|
+        next if row.text.strip.size < 30
+        results << { :source => url, :url => "http://www.rules.house.gov/News/"+row.children[0].children[1].children[0]['href'], :title => row.children[0].children[1].children[0].text, :date => Date.parse(row.children[2].children[1].text.strip), :domain => "http://www.rules.house.gov/", :party => 'majority' }
+      end
+      results
+    end
+    
+    def self.house_ways_means_majority
+      results = []
+      url = "http://waysandmeans.house.gov/news/documentquery.aspx?DocumentTypeID=1496"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//ul[@class='UnorderedNewsList']").children.each do |row|
+        next if row.text.strip.size < 10
+        results << { :source => url, :url => "http://waysandmeans.house.gov"+row.children[1].children[1]['href'], :title => row.children[1].children[1].text, :date => Date.parse(row.children[3].children[0].text.strip), :domain => "http://waysandmeans.house.gov/", :party => 'majority' }
+      end
+      results
     end
     
     ## special cases for members without RSS feeds
