@@ -152,8 +152,8 @@ module Statement
       url = "http://www.indian.senate.gov/news/index.cfm"
       doc = open_html(url)
       return if doc.nil?
-      doc.xpath("//ol[@class='contentList pressRelease']").each do |row|
-        results << { :source => url, :url => "http://www.indian.senate.gov"+row.children[0].children[1].children[3].children[0]['href'], :title => row.children[0].children[1].children[3].children[0].text, :date => Date.parse(row.children[0].children[1].children[1].text), :domain => "http://www.hsgac.senate.gov/", :party => 'majority' }
+      doc.xpath("//h3").each do |row|
+        results << { :source => url, :url => "http://www.indian.senate.gov"+row.children[0]['href'], :title => row.children[0].text, :date => Date.parse(row.previous.previous.text), :domain => "http://www.indian.senate.gov/", :party => 'majority' }
       end
       results
     end
