@@ -6,9 +6,8 @@ require 'nokogiri'
 include Statement
 
 module Statement
-  
   class Feed
-    
+  
     def self.open_rss(url)
       begin
         Nokogiri::XML(open(url))
@@ -32,7 +31,7 @@ module Statement
       return unless doc
       links = doc.xpath('//item')
       results = links.map do |link|
-        abs_link = Statement::Utils.absolute_link(url, link.xpath('link').text)
+        abs_link = Utils.absolute_link(url, link.xpath('link').text)
         abs_link = "http://www.burr.senate.gov/public/"+ link.xpath('link').text if url == 'http://www.burr.senate.gov/public/index.cfm?FuseAction=RSS.Feed'
         abs_link = link.xpath('link').text[37..-1] if url == "http://www.johanns.senate.gov/public/?a=RSS.Feed"
         { :source => url, :url => abs_link, :title => link.xpath('title').text, :date => date_from_rss_item(link), :domain => URI.parse(url).host }
