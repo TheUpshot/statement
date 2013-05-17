@@ -28,6 +28,14 @@ module Statement
       Utils.remove_generic_urls!(results)
     end
     
+    def self.member_methods
+      [:capuano, :cold_fusion, :conaway, :susandavis, :faleomavaega, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter_cowan, :donnelly, :inhofe, :levin, :reid, :palazzo, :document_query]
+    end
+    
+    def self.committee_methods
+      [:senate_approps_majority, :senate_approps_minority, :senate_banking, :senate_hsag_majority, :senate_hsag_minority, :senate_indian, :senate_aging, :senate_smallbiz_minority, :senate_intel, :house_energy_minority, :house_homeland_security_minority, :house_judiciary_majority, :house_rules_majority, :house_ways_means_majority]
+    end
+    
     def self.member_scrapers
       year = Date.today.year
       results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
@@ -80,7 +88,7 @@ module Statement
       results
     end
     
-    def self.senate_banking(year)
+    def self.senate_banking(year=Date.today.year)
       results = []
       url = "http://www.banking.senate.gov/public/index.cfm?FuseAction=Newsroom.PressReleases&ContentRecordType_id=b94acc28-404a-4fc6-b143-a9e15bf92da4&Region_id=&Issue_id=&MonthDisplay=0&YearDisplay=#{year}"
       doc = open_html(url)
@@ -91,7 +99,7 @@ module Statement
       results
     end
     
-    def self.senate_hsag_majority(year)
+    def self.senate_hsag_majority(year=Date.today.year)
       results = []
       url = "http://www.hsgac.senate.gov/media/majority-media?year=#{year}"
       doc = open_html(url)
@@ -103,7 +111,7 @@ module Statement
       results
     end
     
-    def self.senate_hsag_minority(year)
+    def self.senate_hsag_minority(year=Date.today.year)
       results = []
       url = "http://www.hsgac.senate.gov/media/minority-media?year=#{year}"
       doc = open_html(url)
@@ -148,7 +156,7 @@ module Statement
       results
     end
     
-    def self.senate_intel(congress, start_year, end_year)
+    def self.senate_intel(congress=113, start_year=2013, end_year=2014)
       results = []
       url = "http://www.intelligence.senate.gov/press/releases.cfm?congress=#{congress}&y1=#{start_year}&y2=#{end_year}"
       doc = open_html(url)
@@ -238,7 +246,7 @@ module Statement
       return results[0..-5]
     end
     
-    def self.cold_fusion(year, month)
+    def self.cold_fusion(year=Date.today.year, month=0)
       results = []
       year = Date.today.year if not year
       month = 0 if not month
