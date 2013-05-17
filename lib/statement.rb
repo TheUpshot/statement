@@ -341,9 +341,9 @@ module Statement
     
     def self.freshman_senators
       results = []
-      ['baldwin', 'flake', 'hirono','heinrich','murphy','scott','king','heitkamp','cruz','kaine'].each do |senator|
+      ['baldwin', 'flake', 'hirono','heinrich','murphy','scott','king','heitkamp','cruz'].each do |senator|
         base_url = "http://www.#{senator}.senate.gov/"
-        doc = Statement::Link.open_html(base_url+'press.cfm?maxrows=200&startrow=1&&type=1')
+        doc = open_html(base_url+'press.cfm?maxrows=200&startrow=1&&type=1')
         return if doc.nil?
         doc.xpath("//tr")[3..-1].each do |row|
           next if row.text.strip == ''
