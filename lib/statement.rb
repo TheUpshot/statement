@@ -5,5 +5,5 @@ require "statement/utils"
 include Statement
 
 module Statement
- 
+  extend Utils
 end
