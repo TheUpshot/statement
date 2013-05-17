@@ -29,6 +29,10 @@ module Statement
       end
     end
     
+    def self.remove_generic_urls!(results)
+      results.reject{|r| URI.parse(r[:url]).path == '/news/' or URI.parse(r[:url]).path == '/news'}
+    end
+    
     def self.date_from_rss_item(link)
       if !link.xpath('pubDate').text.empty?
         Date.parse(link.xpath('pubDate').text)
@@ -43,12 +47,13 @@ module Statement
       doc = open_rss(url)
       return unless doc
       links = doc.xpath('//item')
-      links.map do |link|
+      results = links.map do |link|
         abs_link = absolute_link(url, link.xpath('link').text)
         abs_link = "http://www.burr.senate.gov/public/"+ link.xpath('link').text if url == 'http://www.burr.senate.gov/public/index.cfm?FuseAction=RSS.Feed'
         abs_link = link.xpath('link').text[37..-1] if url == "http://www.johanns.senate.gov/public/?a=RSS.Feed"
         { :source => url, :url => abs_link, :title => link.xpath('title').text, :date => date_from_rss_item(link), :domain => URI.parse(url).host }
       end
+      remove_generic_urls!(results)
     end
     
     def self.house_gop(url)
@@ -57,31 +62,35 @@ module Statement
       uri = URI.parse(url)
       date = Date.parse(uri.query.split('=').last)
       links = doc.xpath("//ul[@id='membernews']").search('a')
-      links.map do |link| 
+      results = links.map do |link| 
         abs_link = absolute_link(url, link["href"])
         { :source => url, :url => abs_link, :title => link.text.strip, :date => date, :domain => URI.parse(link["href"]).host }
       end
+      remove_generic_urls!(results)
     end
     
     def self.from_scrapers
       year = Date.today.year
-      [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
+      results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), donnelly(year=year), lautenberg, crapo, coburn, boxer(start=1), mccain(year=year), 
         vitter_cowan(year=year), inhofe(year=year), reid].flatten
+      remove_generic_urls!(results)
     end
     
     def self.backfill_from_scrapers
-      [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3), 
+      results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3), 
         document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21), 
         boxer(start=31), boxer(start=41), mccain(year=2012), mccain(year=2011), vitter_cowan(year=2012), vitter_cowan(year=2011),
         ].flatten
+      remove_generic_urls!(results)
     end
     
     def self.committee_scrapers
       year = Date.today.year
-      [senate_approps_majority, senate_approps_minority, senate_banking(year), senate_hsag_majority(year), senate_hsag_minority(year),
+      results = [senate_approps_majority, senate_approps_minority, senate_banking(year), senate_hsag_majority(year), senate_hsag_minority(year),
          senate_indian, senate_aging, senate_smallbiz_minority, senate_intel(113, 2013, 2014), house_energy_minority, house_homeland_security_minority,
          house_judiciary_majority, house_rules_majority, house_ways_means_majority].flatten
+      remove_generic_urls!(results)
     end
     
     ## special cases for committees without RSS feeds
