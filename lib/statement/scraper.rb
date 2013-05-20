@@ -308,7 +308,7 @@ module Statement
     
     def self.freshman_senators
       results = []
-      ['baldwin', 'flake', 'hirono','heinrich','murphy','scott','king','heitkamp','cruz'].each do |senator|
+      ['baldwin', 'flake', 'hirono','heinrich','murphy','king','heitkamp','cruz'].each do |senator|
         base_url = "http://www.#{senator}.senate.gov/"
         doc = open_html(base_url+'press.cfm?maxrows=200&startrow=1&&type=1')
         return if doc.nil?
