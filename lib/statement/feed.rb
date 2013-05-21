@@ -3,7 +3,6 @@ require 'uri'
 require 'open-uri'
 require 'american_date'
 require 'nokogiri'
-include Statement
 
 module Statement
   class Feed
