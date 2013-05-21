@@ -23,7 +23,7 @@ module Statement
     def batch(member_ids)
       results = []
       member_ids.each_slice(50) do |members|
-        results << graph.batch {|batch_api| m.each {|member| batch_api.get_connection(member, 'feed')}}
+        results << graph.batch {|batch_api| members.each {|member| batch_api.get_connection(member, 'feed')}}
       end
       results
     end
