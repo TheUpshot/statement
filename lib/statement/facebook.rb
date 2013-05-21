@@ -21,11 +21,11 @@ module Statement
     
     # given an array of congressional facebook ids, pulls feeds in batches of 50.
     def batch(member_ids)
-      @@config = YAML.load_file("config.yml") rescue nil || {}
-      nyt_congress_api_key = ENV['NYT_CONGRESS_API_KEY'] || @@config['nyt_congress_api_key']
-      
-      
+      results = []
+      member_ids.each_slice(50) do |members|
+        results << graph.batch {|batch_api| m.each {|member| batch_api.get_connection(member, 'feed')}}
+      end
+      results
     end
-    
   end
 end
