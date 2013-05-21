@@ -23,4 +23,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock'
   spec.add_dependency "american_date"
   spec.add_dependency "nokogiri"
+  spec.add_dependency "koala"
+  spec.add_dependency "oj"
 end
