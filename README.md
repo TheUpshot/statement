@@ -28,13 +28,22 @@ $ gem install statement
 
 ## Usage
 
+Statement provides access to press releases and Facebook status updates from members of Congress. Most congressional offices have RSS feeds but some require HTML scraping. To parse an RSS feed, simply pass the URL to Statement's Feed class:
+
 ```ruby
 require 'rubygems'
 require 'statement'
     
-results = Statement::Link.from_rss('http://blumenauer.house.gov/index.php?option=com_bca-rss-syndicator&feed_id=1')
+results = Statement::Feed.from_rss('http://blumenauer.house.gov/index.php?option=com_bca-rss-syndicator&feed_id=1')
 puts results.first
 {:source=>"http://blumenauer.house.gov/index.php?option=com_bca-rss-syndicator&feed_id=1", :url=>"http://blumenauer.house.gov/index.php?option=com_content&amp;view=article&amp;id=2203:blumenauer-qwe-need-a-national-system-that-speaks-to-the-transportation-challenges-of-todayq&amp;catid=66:2013-press-releases", :title=>"Blumenauer: &quot;We need a national system that speaks to the transportation challenges of ...", :date=>#<Date: 2013-04-24 ((2456407j,0s,0n),+0s,2299161j)>, :domain=>"blumenauer.house.gov"}
+```
+
+The sites that require HTML scraping are detailed in individual methods, and can be called individually or in bulk:
+
+```
+`results = Statement::Scraper.billnelson`
+`all_scraped_members = Statement::Scraper.member_scrapers`
 ```
 
 ## Tests
