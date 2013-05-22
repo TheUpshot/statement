@@ -42,8 +42,22 @@ puts results.first
 The sites that require HTML scraping are detailed in individual methods, and can be called individually or in bulk:
 
 ```
-`results = Statement::Scraper.billnelson`
-`all_scraped_members = Statement::Scraper.member_scrapers`
+results = Statement::Scraper.billnelson
+members = Statement::Scraper.member_scrapers
+```
+
+Using the `koala` gem, Statement can fetch Facebook status feeds, given a Facebook ID:
+
+```
+f = Statement::Facebook.new
+results = f.feed('RepFincherTN08')
+```
+
+It also can process IDs in batches, with a `slice` argument to indicate how many ids are passed in each batch:
+
+```
+f = Statement::Facebook.new
+results = f.batch(array, 10)
 ```
 
 ## Tests
