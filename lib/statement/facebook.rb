@@ -20,12 +20,13 @@ module Statement
     end
     
     # given an array of congressional facebook ids, pulls feeds in batches of 50.
-    def batch(member_ids)
+    def batch(member_ids, slice)
       results = []
-      member_ids.each_slice(50) do |members|
+      member_ids.each_slice(slice) do |members|
         results << graph.batch {|batch_api| members.each {|member| batch_api.get_connection(member, 'feed')}}
       end
       results
     end
+    
   end
 end
