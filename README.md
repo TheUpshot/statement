@@ -46,7 +46,7 @@ results = Statement::Scraper.billnelson
 members = Statement::Scraper.member_scrapers
 ```
 
-Using the `koala` gem, Statement can fetch Facebook status feeds, given a Facebook ID:
+Using the `koala` gem, Statement can fetch Facebook status feeds, given a Facebook ID. You'll need to either set environment variables `APP_ID` and `APP_SECRET` or create a `config.yml` file containing `app_id` and `app_secret` keys and values.
 
 ```
 f = Statement::Facebook.new
