@@ -233,15 +233,14 @@ module Statement
       list_url = base_url + 'date.shtml'
       doc = open_html(list_url)
       return if doc.nil?
-      doc.xpath("//a").each do |link|
-        if link['href'] and link['href'].include?('/pr')
-          begin 
-            date = Date.parse(link.text) 
-          rescue 
-            date = nil
-          end
-          results << { :source => list_url, :url => base_url + link['href'], :title => link.text.split(' ',2).last, :date => date, :domain => "www.house.gov/capuano/" }
+      doc.xpath("//a").select{|l| !l['href'].nil? and l['href'].include?('/pr')}[1..-5].each do |link|
+        begin
+          year = link['href'].split('/').first
+          date = Date.parse(link.text.split(' ').first+'/'+year) 
+        rescue
+          date = nil
         end
+        results << { :source => list_url, :url => base_url + link['href'], :title => link.text.split(' ',2).last, :date => date, :domain => "www.house.gov/capuano/" }
       end
       return results[0..-5]
     end
