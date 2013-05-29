@@ -41,27 +41,28 @@ puts results.first
 
 The sites that require HTML scraping are detailed in individual methods, and can be called individually or in bulk:
 
-```
+```ruby
 results = Statement::Scraper.billnelson
 members = Statement::Scraper.member_scrapers
 ```
 
 Using the `koala` gem, Statement can fetch Facebook status feeds, given a Facebook ID. You'll need to either set environment variables `APP_ID` and `APP_SECRET` or create a `config.yml` file containing `app_id` and `app_secret` keys and values.
 
-```
+```ruby
 f = Statement::Facebook.new
 results = f.feed('RepFincherTN08')
 ```
 
 It also can process IDs in batches by passing an array of IDs and a `slice` argument to indicate how many ids in each batch:
-```
+
+```ruby
 f = Statement::Facebook.new
 results = f.batch(facebook_ids, 10)
 ```
 
 In all cases Statement strips out posts that are not by the ID, and returns a Hash containing attributes from the feed:
 
-```
+```ruby
 {:id=>"9307301412_10151632750071413", :body=>"This is Gold Star Mother Larraine McGee whose son, Christopher Everett, Army National Guard, was killed in action September 2005. Precious family.", :link=>"http://www.facebook.com/photo.php?fbid=10151632750021413&set=a.118418671412.133511.9307301412&type=1&relevant_count=1", :title=>nil, :type=>"photo", :status_type=>"added_photos", :created_time=>#<DateTime: 2013-05-28T14:49:08+00:00 ((2456441j,53348s,0n),+0s,2299161j)>, :updated_time=>#<DateTime: 2013-05-28T17:41:37+00:00 ((2456441j,63697s,0n),+0s,2299161j)>, :facebook_id=>"9307301412"}
 ```
 
