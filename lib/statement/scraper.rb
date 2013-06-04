@@ -39,7 +39,7 @@ module Statement
     def self.member_scrapers
       year = Date.today.year
       results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
-        document_query(page=1), document_query(page=2), farenthold(year), donnelly(year=year), lautenberg, crapo, coburn, boxer(start=1), mccain(year=year), 
+        document_query(page=1), document_query(page=2), farenthold(year), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
         vitter_cowan(year=year), inhofe(year=year), reid].flatten
       Utils.remove_generic_urls!(results)
     end
