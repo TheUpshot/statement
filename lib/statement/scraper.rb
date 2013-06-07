@@ -313,7 +313,7 @@ module Statement
         return if doc.nil?
         doc.xpath("//tr")[3..-1].each do |row|
           next if row.text.strip == ''
-          results << { :source => base_url+'press.cfm?maxrows=200&startrow=1&&type=1', :url => base_url + row.children.children[1]['href'], :title => row.children.children[1].text.strip.split.join(' '), :date => Date.parse(row.children.children[0].text), :domain => "#{senator}.senate.gov" }
+          results << { :source => base_url+'press.cfm?maxrows=200&startrow=1&&type=1', :url => base_url + row.children.children[1]['href'], :title => row.children.children[1].text.strip.split.join(' '), :date => Date.strptime(row.children.children[0].text, "%m/%d/%y"), :domain => "#{senator}.senate.gov" }
         end
       end
       results.flatten
@@ -327,7 +327,7 @@ module Statement
         doc = open_html(year_url)
         return if doc.nil?
         doc.xpath("//dt").each do |row|
-          results << { :source => year_url, :url => base_url + row.next.children[0]['href'], :title => row.next.text.strip.gsub(/[u201cu201d]/, '').split.join(' '), :date => Date.parse(row.text), :domain => "klobuchar.senate.gov" }
+          results << { :source => year_url, :url => base_url + row.next.children[0]['href'], :title => row.next.text.strip.gsub(/[u201cu201d]/, '').split.join(' '), :date => Date.strptime(row.text, "%m/%d/%y"), :domain => "klobuchar.senate.gov" }
         end
       end
       results
@@ -365,7 +365,7 @@ module Statement
       doc = open_html(url)
       return if doc.nil?
       doc.xpath("//tr")[4..-2].each do |row|
-        results << { :source => url, :url => base_url + row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip), :domain => "lautenberg.senate.gov" }
+        results << { :source => url, :url => base_url + row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.strptime(row.children[0].text.strip, "%m/%d/%y"), :domain => "lautenberg.senate.gov" }
       end
       results
     end
@@ -389,7 +389,7 @@ module Statement
       return if doc.nil?
       doc.xpath("//tr")[2..-1].each do |row|
         next if row.text[0..3] == "Date"
-        results << { :source => url, :url => row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip), :domain => "coburn.senate.gov" }
+        results << { :source => url, :url => row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.strptime(row.children[0].text.strip, "%m/%d/%y"), :domain => "coburn.senate.gov" }
       end
       results
     end
@@ -413,7 +413,7 @@ module Statement
       doc = open_html(url)
       return if doc.nil?
       doc.xpath("//li")[7..-1].each do |row|
-        results << { :source => url, :url => domain + row.children[3].children[1].children[4].children[0]['href'], :title => row.children[3].children[1].children[4].text, :date => Date.parse(row.children[3].children[1].children[0].text), :domain => domain}
+        results << { :source => url, :url => domain + row.children[3].children[1].children[4].children[0]['href'], :title => row.children[3].children[1].children[4].text, :date => Date.strptime(row.children[3].children[1].children[0].text, "%m/%d/%y"), :domain => domain}
       end
       results
     end
@@ -432,7 +432,7 @@ module Statement
         return if doc.nil?
         doc.xpath("//tr")[1..-1].each do |row|
           next if row.text.strip.size < 30
-          results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.parse(row.children[0].text), :domain => domain}
+          results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.strptime(row.children[0].text, "%m/%d/%y"), :domain => domain}
         end
       end
       results.flatten
@@ -446,7 +446,7 @@ module Statement
       return if doc.nil?
       doc.xpath("//tr")[1..-1].each do |row|
         next if row.text.strip.size < 30
-        results << { :source => url, :url => "http://www.donnelly.senate.gov"+row.children[2].children[1]['href'].strip, :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text), :domain => domain}
+        results << { :source => url, :url => "http://www.donnelly.senate.gov"+row.children[2].children[1]['href'].strip, :title => row.children[2].text.strip, :date => Date.strptime(row.children[0].text, "%m/%d/%y"), :domain => domain}
       end
       results
     end
@@ -459,7 +459,7 @@ module Statement
       return if doc.nil?
       doc.xpath("//tr")[1..-1].each do |row|
         next if row.text.strip.size < 30
-        results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.parse(row.children[0].text), :domain => domain}
+        results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.strptime(row.children[0].text, "%m/%d/%y"), :domain => domain}
       end
       results
     end
