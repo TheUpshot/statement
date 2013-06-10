@@ -3,7 +3,7 @@ require "statement/feed"
 require "statement/scraper"
 require "statement/utils"
 require "statement/facebook"
-require "statement/twitter"
+require "statement/tweets"
 
 module Statement
   extend Utils
