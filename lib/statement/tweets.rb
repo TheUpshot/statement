@@ -23,7 +23,7 @@ module Statement
     def process_results(tweets)
       results = []
       tweets.each do |tweet|
-        results << { :id => tweet[:id], :body => tweet[:text], :link => tweet[:urls].first[:expanded_url], :in_reply_to_screen_name => tweet[:in_reply_to_screen_name], :tweet_number => tweet[:statuses_count], :created_time => DateTime.parse(link[:created_at]), :retweets => tweet[:retweet_count], :favorites => tweet[:favorite_count] }
+        results << { :id => tweet[:id], :body => tweet[:text], :link => tweet[:urls].first[:expanded_url], :in_reply_to_screen_name => tweet[:in_reply_to_screen_name], :tweet_number => tweet[:statuses_count], :created_time => DateTime.parse(tweet[:created_at]), :retweets => tweet[:retweet_count], :favorites => tweet[:favorite_count] }
       end
       results
     end
