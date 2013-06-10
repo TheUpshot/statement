@@ -17,13 +17,14 @@ module Statement
     end
     
     def timeline(member_id)
-      process_results(@client.user_timeline(member_id))
+      process_results(client.user_timeline(member_id))
     end
     
     def process_results(tweets)
       results = []
       tweets.each do |tweet|
-        results << { :id => tweet[:id], :body => tweet[:text], :link => tweet[:urls].first[:expanded_url], :in_reply_to_screen_name => tweet[:in_reply_to_screen_name], :tweet_number => tweet[:statuses_count], :created_time => DateTime.parse(tweet[:created_at]), :retweets => tweet[:retweet_count], :favorites => tweet[:favorite_count] }
+        url = tweet[:urls].first ? tweet[:urls].first[:expanded_url] : nil
+        results << { :id => tweet[:id], :body => tweet[:text], :link => url, :in_reply_to_screen_name => tweet[:in_reply_to_screen_name], :total_tweets => tweet[:user][:statuses_count], :created_time => tweet[:created_at], :retweets => tweet[:retweet_count], :favorites => tweet[:favorite_count] }
       end
       results
     end
