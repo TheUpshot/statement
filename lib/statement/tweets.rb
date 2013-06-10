@@ -2,7 +2,7 @@ require 'twitter'
 require 'yaml'
 
 module Statement
-  class Twitter
+  class Tweets
     
     attr_accessor :client, :timeline
     
