@@ -28,7 +28,12 @@ $ gem install statement
 
 ## Usage
 
-Statement provides access to press releases and Facebook status updates from members of Congress. Most congressional offices have RSS feeds but some require HTML scraping. To parse an RSS feed, simply pass the URL to Statement's Feed class:
+Statement provides access to press releases, Facebook status updates and tweets from members of Congress. Most congressional offices have RSS feeds but some require HTML scraping. 
+
+
+### Press Releases
+
+To parse an RSS feed, simply pass the URL to Statement's Feed class:
 
 ```ruby
 require 'rubygems'
@@ -45,6 +50,8 @@ The sites that require HTML scraping are detailed in individual methods, and can
 results = Statement::Scraper.billnelson
 members = Statement::Scraper.member_scrapers
 ```
+
+### Facebook Updates
 
 Using the `koala` gem, Statement can fetch Facebook status feeds, given a Facebook ID. You'll need to either set environment variables `APP_ID` and `APP_SECRET` or create a `config.yml` file containing `app_id` and `app_secret` keys and values.
 
@@ -64,6 +71,25 @@ In all cases Statement strips out posts that are not by the ID, and returns a Ha
 
 ```ruby
 {:id=>"9307301412_10151632750071413", :body=>"This is Gold Star Mother Larraine McGee whose son, Christopher Everett, Army National Guard, was killed in action September 2005. Precious family.", :link=>"http://www.facebook.com/photo.php?fbid=10151632750021413&set=a.118418671412.133511.9307301412&type=1&relevant_count=1", :title=>nil, :type=>"photo", :status_type=>"added_photos", :created_time=>#<DateTime: 2013-05-28T14:49:08+00:00 ((2456441j,53348s,0n),+0s,2299161j)>, :updated_time=>#<DateTime: 2013-05-28T17:41:37+00:00 ((2456441j,63697s,0n),+0s,2299161j)>, :facebook_id=>"9307301412"}
+```
+
+### Tweets
+
+Using the `twitter` gem, Statement can retrieve individual user timelines or list timelines:
+
+```ruby
+t = Statement::Tweets.new
+t.timeline('Robert_Aderholt')
+[{:id=>344168849484169216, :body=>"Check out the @GOPLeader's weekly schedule for the House this week. http://t.co/mh3FZnK4a8", :link=>"http://majorityleader.gov/floor/weekly.html", :in_reply_to_screen_name=>nil, :total_tweets=>699, :created_time=>2013-06-10 15:07:02 -0400, :retweets=>0, :favorites=>0, :screen_name=>"Robert_Aderholt"}...]
+```
+Note that the `created_time` attribute is a Ruby Time object, as returned by the `twitter` gem.
+
+To retrieve a list's timeline, pass in the owner (defaults to nil) and list slug:
+
+```ruby
+t = Statement::Tweets.new
+t.bulk_timeline('congress')
+[:id=>343541632844587008, :body=>"On the Skagit river getting a close-up view of the bridge repairs. http://t.co/SMsdwiFaR6", :link=>nil, :in_reply_to_screen_name=>nil, :total_tweets=>226, :created_time=>2013-06-08 21:34:42 -0400, :retweets=>1, :favorites=>2, :screen_name=>"RepDelBene"}..]
 ```
 
 ## Tests
