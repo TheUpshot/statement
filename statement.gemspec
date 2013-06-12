@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "koala"
   spec.add_dependency "oj"
   spec.add_dependency "twitter"
+  spec.add_dependency "typhoeus"
 end
