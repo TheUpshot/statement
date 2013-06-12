@@ -10,17 +10,22 @@ module Statement
     
     def self.batch(urls)
       results = []
+      failures = []
       hydra = Typhoeus::Hydra.new
       urls.each do |url|
         req = Typhoeus::Request.new(url)
         req.on_complete do |response|
-          doc = Nokogiri::XML(response.body)
-          results << parse_rss(doc, url)
+          if response.success?
+            doc = Nokogiri::XML(response.body)
+            results << parse_rss(doc, url)
+          else
+            failures << url
+          end
         end
         hydra.queue(req)
       end
       hydra.run
-      results.flatten
+      [results.flatten, failures]
     end
   
     def self.open_rss(url)
