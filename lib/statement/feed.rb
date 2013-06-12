@@ -3,9 +3,25 @@ require 'uri'
 require 'open-uri'
 require 'american_date'
 require 'nokogiri'
+require 'typhoeus'
 
 module Statement
   class Feed
+    
+    def self.batch(urls)
+      results = []
+      hydra = Typhoeus::Hydra.new
+      urls.each do |url|
+        req = Typhoeus::Request.new(url)
+        req.on_complete do |response|
+          doc = Nokogiri::XML(response.body)
+          results << parse_rss(doc, url)
+        end
+        hydra.queue(req)
+      end
+      hydra.run
+      results.flatten
+    end
   
     def self.open_rss(url)
       begin
@@ -28,6 +44,10 @@ module Statement
     def self.from_rss(url)
       doc = open_rss(url)
       return unless doc
+      parse_rss(doc, url)
+    end
+    
+    def self.parse_rss(doc, url)
       links = doc.xpath('//item')
       results = links.map do |link|
         abs_link = Utils.absolute_link(url, link.xpath('link').text)
