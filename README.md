@@ -44,11 +44,11 @@ puts results.first
 {:source=>"http://blumenauer.house.gov/index.php?option=com_bca-rss-syndicator&feed_id=1", :url=>"http://blumenauer.house.gov/index.php?option=com_content&amp;view=article&amp;id=2203:blumenauer-qwe-need-a-national-system-that-speaks-to-the-transportation-challenges-of-todayq&amp;catid=66:2013-press-releases", :title=>"Blumenauer: &quot;We need a national system that speaks to the transportation challenges of ...", :date=>#<Date: 2013-04-24 ((2456407j,0s,0n),+0s,2299161j)>, :domain=>"blumenauer.house.gov"}
 ```
 
-If you have a batch of RSS URLs, you can pass them to Feed's `batch` class method, which will use Typhoeus to fetch them in parallel:
+If you have a batch of RSS URLs, you can pass them to Feed's `batch` class method, which will use Typhoeus to fetch them in parallel and returns a two-element array of results and failed urls:
 
 ```ruby
 urls = ['http://aderholt.house.gov/common/rss//index.cfm?rss=20', 'http://andrews.house.gov/rss.xml', "http://alexander.house.gov/common/rss/?rss=24", "http://amash.house.gov/rss.xml"]
-results = Statement::Feed.batch(urls)
+results, failures = Statement::Feed.batch(urls)
 ```
 
 The sites that require HTML scraping are detailed in individual methods, and can be called individually or in bulk:
