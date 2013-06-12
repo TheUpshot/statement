@@ -22,7 +22,7 @@ module Statement
     end
     
     # fetches latest 100 tweets from a list (derekwillis twitter acct has a public congress list)
-    def bulk_timeline(list_owner=nil, list_id)
+    def bulk_timeline(list_id, list_owner=nil)
       process_results(client.list_timeline(list_owner, list_id, {:count => 100}))
     end
     
