@@ -91,7 +91,7 @@ t.timeline('Robert_Aderholt')
 ```
 Note that the `created_time` attribute is a Ruby Time object, as returned by the `twitter` gem.
 
-To retrieve a list's timeline, pass in the owner (defaults to nil) and list slug:
+To retrieve a list's timeline, pass in the list slug and the owner (defaults to nil):
 
 ```ruby
 t = Statement::Tweets.new
