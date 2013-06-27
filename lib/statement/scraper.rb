@@ -413,7 +413,7 @@ module Statement
       doc = open_html(url)
       return if doc.nil?
       doc.xpath("//li")[7..-1].each do |row|
-        results << { :source => url, :url => "http://"+domain + row.children[3].children[1].children[4].children[0]['href'], :title => row.children[3].children[1].children[4].text, :date => Date.strptime(row.children[3].children[1].children[0].text, "%m/%d/%y"), :domain => domain}
+        results << { :source => url, :url => "http://"+domain+'/public/'+row.children[3].children[1].children[4].children[0]['href'], :title => row.children[3].children[1].children[4].text, :date => Date.strptime(row.children[3].children[1].children[0].text, "%m/%d/%y"), :domain => domain}
       end
       results
     end
