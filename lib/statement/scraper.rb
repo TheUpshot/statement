@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :susandavis, :faleomavaega, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter_cowan, :donnelly, :inhofe, :levin, :reid, :palazzo, :document_query, :farenthold]
+      [:capuano, :cold_fusion, :conaway, :susandavis, :faleomavaega, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :document_query, :farenthold]
     end
     
     def self.committee_methods
@@ -40,14 +40,14 @@ module Statement
       year = Date.today.year
       results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), farenthold(year), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
-        vitter_cowan(year=year), inhofe(year=year), reid].flatten
+        vitter(year=year), inhofe(year=year), reid].flatten
       Utils.remove_generic_urls!(results)
     end
     
     def self.backfill_from_scrapers
       results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3), 
         document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21), 
-        boxer(start=31), boxer(start=41), mccain(year=2012), mccain(year=2011), vitter_cowan(year=2012), vitter_cowan(year=2011),
+        boxer(start=31), boxer(start=41), mccain(year=2012), mccain(year=2011), vitter(year=2012), vitter(year=2011),
         ].flatten
       Utils.remove_generic_urls!(results)
     end
@@ -418,24 +418,17 @@ module Statement
       results
     end
     
-    def self.vitter_cowan(year=Date.today.year)
+    def self.vitter(year=Date.today.year)
       results = []
-      urls = ["http://www.vitter.senate.gov/newsroom/", "http://www.cowan.senate.gov/"]
-      urls.each do |url|
-        next if year < 2013 and url == "http://www.cowan.senate.gov/"
-        if url == "http://www.vitter.senate.gov/newsroom/"
-          domain = "www.vitter.senate.gov"
-        elsif url == "http://www.cowan.senate.gov/"
-          domain = "www.cowan.senate.gov"
-        end
-        doc = open_html(url+"press?year=#{year}")
-        return if doc.nil?
-        doc.xpath("//tr")[1..-1].each do |row|
-          next if row.text.strip.size < 30
-          results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.strptime(row.children[0].text, "%m/%d/%y"), :domain => domain}
-        end
+      url = "http://www.vitter.senate.gov/newsroom/"
+      domain = "www.vitter.senate.gov"
+      doc = open_html(url+"press?year=#{year}")
+      return if doc.nil?
+      doc.xpath("//tr")[1..-1].each do |row|
+        next if row.text.strip.size < 30
+        results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.strptime(row.children[0].text, "%m/%d/%y"), :domain => domain}
       end
-      results.flatten
+      results
     end
     
     def self.donnelly(year=Date.today.year)
