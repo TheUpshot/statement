@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :susandavis, :faleomavaega, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :document_query, :farenthold]
+      [:capuano, :cold_fusion, :conaway, :susandavis, :faleomavaega, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :document_query, :farenthold, :swalwell]
     end
     
     def self.committee_methods
@@ -39,7 +39,7 @@ module Statement
     def self.member_scrapers
       year = Date.today.year
       results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
-        document_query(page=1), document_query(page=2), farenthold(year), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
+        document_query(page=1), document_query(page=2), farenthold(year), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
         vitter(year=year), inhofe(year=year), reid].flatten
       Utils.remove_generic_urls!(results)
     end
@@ -47,7 +47,7 @@ module Statement
     def self.backfill_from_scrapers
       results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3), 
         document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21), 
-        boxer(start=31), boxer(start=41), mccain(year=2012), mccain(year=2011), vitter(year=2012), vitter(year=2011),
+        boxer(start=31), boxer(start=41), mccain(year=2012), mccain(year=2011), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3)
         ].flatten
       Utils.remove_generic_urls!(results)
     end
@@ -227,6 +227,17 @@ module Statement
     
     ## special cases for members without RSS feeds
     
+    def self.swalwell(page=1)
+      results = []
+      url = "http://swalwell.house.gov/category/press-releases/page/#{page}/"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//h3")[0..4].each do |row|
+        results << { :source => url, :url => row.children[0]['href'], :title => row.children[0].text, :date => nil, :domain => 'swalwell.house.gov'}
+      end
+      results
+    end
+
     def self.capuano
       results = []
       base_url = "http://www.house.gov/capuano/news/"
