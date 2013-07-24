@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :susandavis, :faleomavaega, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :document_query, :farenthold, :swalwell]
+      [:capuano, :cold_fusion, :conaway, :susandavis, :faleomavaega, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :document_query, :farenthold, :swalwell, :fischer]
     end
     
     def self.committee_methods
@@ -40,7 +40,7 @@ module Statement
       year = Date.today.year
       results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), farenthold(year), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
-        vitter(year=year), inhofe(year=year), reid].flatten
+        vitter(year=year), inhofe(year=year), reid, fischer].flatten
       Utils.remove_generic_urls!(results)
     end
     
@@ -389,6 +389,18 @@ module Statement
       return if doc.nil?
       doc.xpath("//tr").each do |row|
         results << { :source => url, :url => base_url + row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip.gsub('-','/')), :domain => "crapo.senate.gov" }
+      end
+      results
+    end
+
+    def self.fischer(year=Date.today.year)
+      results = []
+      url = "http://www.fischer.senate.gov/public/index.cfm/press-releases?MonthDisplay=0&YearDisplay=#{year}"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//tr")[2..-1].each do |row|
+        next if row.text[0..3] == "Date"
+        results << { :source => url, :url => row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.strptime(row.children[0].text.strip, "%m/%d/%y"), :domain => "fischer.senate.gov" }
       end
       results
     end
