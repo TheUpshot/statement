@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :susandavis, :faleomavaega, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :document_query, :farenthold, :swalwell, :fischer]
+      [:capuano, :cold_fusion, :conaway, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :document_query, :farenthold, :swalwell, :fischer]
     end
     
     def self.committee_methods
@@ -38,7 +38,7 @@ module Statement
     
     def self.member_scrapers
       year = Date.today.year
-      results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, faleomavaega, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
+      results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), farenthold(year), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
         vitter(year=year), inhofe(year=year), reid, fischer].flatten
       Utils.remove_generic_urls!(results)
@@ -305,17 +305,6 @@ module Statement
       results
     end
     
-    def self.faleomavaega
-      results = []
-      base_url = "http://www.house.gov/faleomavaega/news-press.shtml"
-      doc = open_html(base_url)
-      return if doc.nil?
-      doc.xpath("//li[@type='disc']").each do |row|
-        results << { :source => base_url, :url => "http://www.house.gov/" + row.children[0]['href'], :title => row.children[0].text.gsub(/[u201cu201d]/, '').split('Washington, D.C.').last, :date => Date.parse(row.children[1].text), :domain => "house.gov/faleomavaega" }
-      end
-      results
-    end
-    
     def self.freshman_senators
       results = []
       ['murphy','cruz'].each do |senator|
@@ -334,11 +323,12 @@ module Statement
       results = []
       base_url = "http://www.klobuchar.senate.gov/"
       [2012,2013].each do |year|
-        year_url = base_url + "newsreleases.cfm?year=#{year}"
+        year_url = base_url + "public/news-releases?MonthDisplay=0&YearDisplay=#{year}"
         doc = open_html(year_url)
         return if doc.nil?
-        doc.xpath("//dt").each do |row|
-          results << { :source => year_url, :url => base_url + row.next.children[0]['href'], :title => row.next.text.strip.gsub(/[u201cu201d]/, '').split.join(' '), :date => Date.strptime(row.text, "%m/%d/%y"), :domain => "klobuchar.senate.gov" }
+        doc.xpath("//tr")[1..-1].each do |row|
+          next if row.children[2].children[0].text.strip == 'Title'
+          results << { :source => year_url, :url => row.children[2].children[0]['href'], :title => row.children[2].children[0].text.strip, :date => Date.strptime(row.children[0].text, "%m/%d/%y"), :domain => "klobuchar.senate.gov" }
         end
       end
       results
