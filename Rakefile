@@ -5,7 +5,7 @@ Bundler::GemHelper.install_tasks
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
+  test.libs << 'lib' << 'spec'
   test.pattern = 'spec/*.rb'
   test.verbose = true
 end
