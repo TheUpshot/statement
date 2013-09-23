@@ -49,6 +49,7 @@ module Statement
     def self.from_rss(url)
       doc = open_rss(url)
       return unless doc
+      return if Mime::Type.new(doc).html?
       parse_rss(doc, url)
     end
     
