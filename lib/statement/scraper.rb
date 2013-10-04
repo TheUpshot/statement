@@ -288,7 +288,7 @@ module Statement
       doc = open_html(page_url)
       return if doc.nil?
       doc.xpath("//li")[41..50].each do |row|
-        results << { :source => page_url, :url => base_url + row.children[1]['href'], :title => row.children[1].children.text.strip, :date => Date.parse(row.children.children[4].text), :domain => "conaway.house.gov" }
+        results << { :source => page_url, :url => base_url + row.children[1]['href'], :title => row.children[1].children.text.strip, :date => Date.parse(row.children[3].text.strip), :domain => "conaway.house.gov" }
       end
       results
     end
