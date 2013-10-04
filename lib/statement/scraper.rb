@@ -41,6 +41,7 @@ module Statement
       results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, susandavis, klobuchar, lujan, palazzo(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), farenthold(year), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
         vitter(year=year), inhofe(year=year), reid, fischer].flatten
+      results = results.compact
       Utils.remove_generic_urls!(results)
     end
     
