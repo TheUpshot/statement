@@ -287,8 +287,8 @@ module Statement
       page_url = base_url + "documentquery.aspx?DocumentTypeID=1279&Page=#{page}"
       doc = open_html(page_url)
       return if doc.nil?
-      doc.xpath("//tr")[1..-1].each do |row|
-        results << { :source => page_url, :url => base_url + row.children.children[1]['href'], :title => row.children.children[1].text.strip, :date => Date.parse(row.children.children[4].text), :domain => "conaway.house.gov" }
+      doc.xpath("//li")[41..50].each do |row|
+        results << { :source => page_url, :url => base_url + row.children[1]['href'], :title => row.children[1].children.text.strip, :date => Date.parse(row.children.children[4].text), :domain => "conaway.house.gov" }
       end
       results
     end
