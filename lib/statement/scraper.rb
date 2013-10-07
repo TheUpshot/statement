@@ -314,6 +314,7 @@ module Statement
         return if doc.nil?
         doc.xpath("//tr")[3..-1].each do |row|
           next if row.text.strip == ''
+          next if row.children.children[1]['href'].nil?
           results << { :source => base_url+'press.cfm?maxrows=200&startrow=1&&type=1', :url => base_url + row.children.children[1]['href'], :title => row.children.children[1].text.strip.split.join(' '), :date => Date.strptime(row.children.children[0].text, "%m/%d/%y"), :domain => "#{senator}.senate.gov" }
         end
       end
