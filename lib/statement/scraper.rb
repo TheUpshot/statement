@@ -303,6 +303,7 @@ module Statement
       doc.xpath("//li")[38..43].each do |row|
         results << { :source => url, :url => base_url + row.children[1]['href'], :title => row.children[1].children.text.strip, :date => Date.parse(row.children[3].text.strip), :domain => "chabot.house.gov" }
       end
+      results
     end
     
     def self.susandavis
