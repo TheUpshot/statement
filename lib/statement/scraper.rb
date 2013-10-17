@@ -261,9 +261,9 @@ module Statement
       results = []
       year = Date.today.year if not year
       month = 0 if not month
-      domains = ['crenshaw.house.gov/', 'www.ronjohnson.senate.gov/public/','www.hoeven.senate.gov/public/','www.moran.senate.gov/public/','www.risch.senate.gov/public/']
+      domains = ['crenshaw.house.gov', 'www.ronjohnson.senate.gov/public/','www.hoeven.senate.gov/public/','www.moran.senate.gov/public/','www.risch.senate.gov/public/']
       domains.each do |domain|
-        if domain == 'crenshaw.house.gov/' or domain == 'www.risch.senate.gov/public/'
+        if domain == 'crenshaw.house.gov' or domain == 'www.risch.senate.gov/public/'
           url = "http://"+domain + "index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
         elsif domain == 'www.hoeven.senate.gov/public/' or domain == 'www.moran.senate.gov/public/'
           url = "http://"+domain + "index.cfm/news-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
