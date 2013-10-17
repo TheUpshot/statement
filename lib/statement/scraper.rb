@@ -264,7 +264,7 @@ module Statement
       domains = ['crenshaw.house.gov', 'www.ronjohnson.senate.gov/public/','www.hoeven.senate.gov/public/','www.moran.senate.gov/public/','www.risch.senate.gov/public/']
       domains.each do |domain|
         if domain == 'crenshaw.house.gov' or domain == 'www.risch.senate.gov/public/'
-          url = "http://"+domain + "index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
+          url = "http://"+domain + "/index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
         elsif domain == 'www.hoeven.senate.gov/public/' or domain == 'www.moran.senate.gov/public/'
           url = "http://"+domain + "index.cfm/news-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
         else
@@ -274,7 +274,7 @@ module Statement
         return if doc.nil?
         doc.xpath("//tr")[2..-1].each do |row|
           date_text, title = row.children.map{|c| c.text.strip}.reject{|c| c.empty?}
-          next if date_text == 'Date' or date_text.size > 8
+          next if date_text == 'Date' or date_text.size > 10
           date = Date.parse(date_text)
           results << { :source => url, :url => row.children[2].children.first['href'], :title => title, :date => date, :domain => domain }
         end
