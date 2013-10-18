@@ -519,6 +519,19 @@ module Statement
       end
       results
     end
+
+    def self.roe(page=1)
+      results = []
+      domain = 'roe.house.gov'
+      url = "http://roe.house.gov/news/documentquery.aspx?DocumentTypeID=1532&Page=#{page}"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//div[@class='middlecopy']//li").each do |row|
+        results << { :source => url, :url => "http://roe.house.gov/news/" + row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain }
+      end     
+
+
+    end
     
     def self.document_query(page=1)
       results = []
