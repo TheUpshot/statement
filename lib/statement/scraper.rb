@@ -528,14 +528,13 @@ module Statement
       return if doc.nil?
       doc.xpath("//div[@class='middlecopy']//li").each do |row|
         results << { :source => url, :url => "http://roe.house.gov/news/" + row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain }
-      end     
-
-
+      end
+      results
     end
     
     def self.document_query(page=1)
       results = []
-      domains = [{"roe.house.gov" => 1532}, {"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}]
+      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
         return if doc.nil?
