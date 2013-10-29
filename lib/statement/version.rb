@@ -1,3 +1,3 @@
 module Statement
-  VERSION = "1.0.15"
+  VERSION = "1.1"
 end
