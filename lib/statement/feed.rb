@@ -49,12 +49,12 @@ module Statement
     def self.from_rss(url)
       doc = open_rss(url)
       return unless doc
-      return if Mime::Type.new(doc).html?
       parse_rss(doc, url)
     end
     
     def self.parse_rss(doc, url)
       links = doc.xpath('//item')
+      return if links.empty?
       results = links.map do |link|
         abs_link = Utils.absolute_link(url, link.xpath('link').text)
         abs_link = "http://www.burr.senate.gov/public/"+ link.xpath('link').text if url == 'http://www.burr.senate.gov/public/index.cfm?FuseAction=RSS.Feed'

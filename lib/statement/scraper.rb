@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :roe, :document_query, :farenthold, :swalwell, :fischer]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer]
     end
     
     def self.committee_methods
@@ -39,7 +39,7 @@ module Statement
     def self.member_scrapers
       year = Date.today.year
       results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, lujan, palazzo(page=1), roe(page=1), billnelson(year=year), 
-        document_query(page=1), document_query(page=2), farenthold(year), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
+        document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
         vitter(year=year), inhofe(year=year), reid, fischer].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
@@ -543,17 +543,6 @@ module Statement
         end
       end
       results.flatten
-    end
-    
-    def self.farenthold(year=2013)
-      results = []
-      url = "http://farenthold.house.gov/index.php?flt_m=&flt_y=#{year}&option=com_content&view=article&id=1181&Itemid=100059&layout=default"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath("//div[@id='idGtReportDisplay']//li").each do |row|
-        results << { :source => url, :url => 'http://farenthold.house.gov'+row.children[0]['href'], :title => row.children[0].text.strip, :date => nil, :domain => "farenthold.house.gov"}
-      end
-      results
     end
     
   end
