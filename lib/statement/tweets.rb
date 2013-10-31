@@ -20,6 +20,11 @@ module Statement
     def timeline(member_id)
       process_results(client.user_timeline(member_id))
     end
+
+    # batch lookup of users, 100 at a time
+    def users(member_ids)
+      client.users(member_ids)
+    end
     
     # fetches latest 100 tweets from a list (derekwillis twitter acct has a public congress list)
     def bulk_timeline(list_id, list_owner=nil)
@@ -34,6 +39,6 @@ module Statement
       end
       results
     end
-    
+
   end
 end
