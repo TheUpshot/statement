@@ -1,5 +1,4 @@
 require 'twitter'
-require 'yaml'
 
 module Statement
   class Tweets
@@ -23,7 +22,11 @@ module Statement
 
     # batch lookup of users, 100 at a time
     def users(member_ids)
-      client.users(member_ids)
+      results = []
+      member_ids.each_slice(100) do |batch|
+        results << client.users(batch)
+      end
+      results.flatten
     end
     
     # fetches latest 100 tweets from a list (derekwillis twitter acct has a public congress list)
