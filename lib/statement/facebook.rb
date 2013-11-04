@@ -8,16 +8,16 @@ module Statement
     attr_accessor :graph, :feed, :batch
     
     def initialize
-      @@config = YAML.load_file("config.yml") rescue nil || {}
-      app_id = ENV['APP_ID'] || @@config['app_id']
-      app_secret = ENV['APP_SECRET'] || @@config['app_secret']
+      @@config = Statement.config rescue nil || {}
+      app_id = @@config[:app_id] || ENV['APP_ID']
+      app_secret = @@config[:app_secret] || ENV['APP_SECRET']
       oauth = Koala::Facebook::OAuth.new(app_id, app_secret)
       @graph = Koala::Facebook::API.new(oauth.get_app_access_token)
     end
     
     def feed(member_id)
       results = graph.get_connection(member_id, 'feed')
-      process_results(results.select{|r| r['from']['id'] == r['link']['id'].split('_').first})
+      process_results(results.select{|r| r['from']['id'] == r['id'].split('_').first})
     end
     
     # given an array of congressional facebook ids, pulls feeds in slices.
