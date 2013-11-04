@@ -39,6 +39,8 @@ Statement.configure(:oauth_token => token, :oauth_token_secret => secret, ...) #
 Statement.configure_with("config.yml") # option 2
 ```
 
+If you don't need to use the Twitter or Facebook APIs, you don't need to setup configuration.
+
 ### Press Releases
 
 To parse an RSS feed, simply pass the URL to Statement's Feed class:
