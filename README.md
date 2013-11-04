@@ -30,6 +30,14 @@ $ gem install statement
 
 Statement provides access to press releases, Facebook status updates and tweets from members of Congress. Most congressional offices have RSS feeds but some require HTML scraping. 
 
+To configure Statement to pull from the Twitter and Facebook APIs, you can pass in configuration values via a hash or a `config.yml` file:
+
+```ruby
+require 'rubygems'
+require 'statement'
+Statement.configure(:oauth_token => token, :oauth_token_secret => secret, ...) # option 1
+Statement.configure_with("config.yml") # option 2
+```
 
 ### Press Releases
 
