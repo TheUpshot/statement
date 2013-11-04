@@ -6,12 +6,12 @@ module Statement
     attr_accessor :client, :timeline, :bulk_timeline
     
     def initialize
-      @@config = YAML.load_file("config.yml") rescue nil || {}
+      @@config = Statement.config rescue nil || {}
       @client = Twitter::Client.new(
-          :consumer_key => ENV['CONSUMER_KEY'] || @@config['consumer_key'],
-          :consumer_secret => ENV['CONSUMER_SECRET'] || @@config['consumer_secret'],
-          :oauth_token => ENV['OAUTH_TOKEN'] || @@config['oauth_token'],
-          :oauth_token_secret => ENV['OAUTH_TOKEN_SECRET'] || @@config['oauth_token_secret']
+          :consumer_key => @@config[:consumer_key] || ENV['CONSUMER_KEY'],
+          :consumer_secret => @@config[:consumer_secret] || ENV['CONSUMER_SECRET'],
+          :oauth_token => @@config[:oauth_token] || ENV['OAUTH_TOKEN'],
+          :oauth_token_secret => @@config[:oauth_token_secret] || ENV['OAUTH_TOKEN_SECRET']
         )
     end
     
