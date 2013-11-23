@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :mccain, :vitter, :donnelly, :inhofe, :levin, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer]
     end
     
     def self.committee_methods
@@ -39,7 +39,7 @@ module Statement
     def self.member_scrapers
       year = Date.today.year
       results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, lujan, palazzo(page=1), roe(page=1), billnelson(year=year), 
-        document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1), mccain(year=year), 
+        document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=year), reid, fischer].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
@@ -48,7 +48,7 @@ module Statement
     def self.backfill_from_scrapers
       results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3), 
         document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21), 
-        boxer(start=31), boxer(start=41), mccain(year=2012), mccain(year=2011), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3)
+        boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3)
         ].flatten
       Utils.remove_generic_urls!(results)
     end
@@ -300,7 +300,7 @@ module Statement
       url = base_url + "documentquery.aspx?DocumentTypeID=2508&Year=#{year}"
       doc = open_html(url)
       return if doc.nil?
-      doc.xpath("//li")[38..43].each do |row|
+      doc.xpath("//li")[40..48].each do |row|
         results << { :source => url, :url => base_url + row.children[1]['href'], :title => row.children[1].children.text.strip, :date => Date.parse(row.children[3].text.strip), :domain => "chabot.house.gov" }
       end
       results
@@ -433,18 +433,6 @@ module Statement
       results
     end
     
-    def self.mccain(year=Date.today.year)
-      results = []
-      url = "http://www.mccain.senate.gov/public/index.cfm?FuseAction=PressOffice.PressReleases&ContentRecordType_id=75e7e4a0-6088-44b6-8061-089d80513dc4&Region_id=&Issue_id=&MonthDisplay=0&YearDisplay=#{year}"
-      domain = 'www.mccain.senate.gov'
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath("//li")[7..-1].each do |row|
-        results << { :source => url, :url => "http://"+domain+'/public/'+row.children[3].children[1].children[4].children[0]['href'], :title => row.children[3].children[1].children[4].text, :date => Date.strptime(row.children[3].children[1].children[0].text, "%m/%d/%y"), :domain => domain}
-      end
-      results
-    end
-    
     def self.vitter(year=Date.today.year)
       results = []
       url = "http://www.vitter.senate.gov/newsroom/"
@@ -480,18 +468,6 @@ module Statement
       doc.xpath("//tr")[1..-1].each do |row|
         next if row.text.strip.size < 30
         results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.strptime(row.children[0].text, "%m/%d/%y"), :domain => domain}
-      end
-      results
-    end
-    
-    def self.levin(page=1)
-      results = []
-      url = "http://www.levin.senate.gov/newsroom/index.cfm?PageNum_rs=#{page}&section=press"
-      domain = "www.levin.senate.gov"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath('//tr').each do |row|
-        results << { :source => url, :url => row.children[2].children[0]['href'].gsub(/\s+/, ""), :title => row.children[2].children[0].text, :date => Date.parse(row.children[0].text), :domain => domain}
       end
       results
     end
