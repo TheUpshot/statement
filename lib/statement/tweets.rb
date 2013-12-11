@@ -3,11 +3,17 @@ require 'twitter'
 module Statement
   class Tweets
     
-    attr_accessor :client, :timeline, :bulk_timeline
+    attr_accessor :client, :rest_client, :timeline, :bulk_timeline
     
     def initialize
       @@config = Statement.config rescue nil || {}
       @client = Twitter::Client.new(
+          :consumer_key => @@config[:consumer_key] || ENV['CONSUMER_KEY'],
+          :consumer_secret => @@config[:consumer_secret] || ENV['CONSUMER_SECRET'],
+          :oauth_token => @@config[:oauth_token] || ENV['OAUTH_TOKEN'],
+          :oauth_token_secret => @@config[:oauth_token_secret] || ENV['OAUTH_TOKEN_SECRET']
+        )
+      @rest_client = Twitter::REST::Client.new(
           :consumer_key => @@config[:consumer_key] || ENV['CONSUMER_KEY'],
           :consumer_secret => @@config[:consumer_secret] || ENV['CONSUMER_SECRET'],
           :oauth_token => @@config[:oauth_token] || ENV['OAUTH_TOKEN'],
@@ -24,7 +30,7 @@ module Statement
     def users(member_ids)
       results = []
       member_ids.each_slice(100) do |batch|
-        results << client.users(batch)
+        results << rest_client.users(batch)
       end
       results.flatten
     end
