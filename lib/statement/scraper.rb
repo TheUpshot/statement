@@ -38,7 +38,7 @@ module Statement
     
     def self.member_scrapers
       year = Date.today.year
-      results = [freshman_senators, capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, lujan, palazzo(page=1), roe(page=1), billnelson(year=year), 
+      results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, lujan, palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=year), reid, fischer].flatten
       results = results.compact
@@ -261,11 +261,11 @@ module Statement
       results = []
       year = Date.today.year if not year
       month = 0 if not month
-      domains = ['crenshaw.house.gov', 'www.ronjohnson.senate.gov/public/','www.hoeven.senate.gov/public/','www.moran.senate.gov/public/','www.risch.senate.gov/public/']
+      domains = ['crenshaw.house.gov', 'www.ronjohnson.senate.gov/public/','www.moran.senate.gov/public/','www.risch.senate.gov/public/']
       domains.each do |domain|
         if domain == 'crenshaw.house.gov' or domain == 'www.risch.senate.gov/public/'
           url = "http://"+domain + "/index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
-        elsif domain == 'www.hoeven.senate.gov/public/' or domain == 'www.moran.senate.gov/public/'
+        elsif domain == 'www.moran.senate.gov/public/'
           url = "http://"+domain + "index.cfm/news-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
         else
           url = "http://"+domain + "index.cfm/press-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
@@ -316,21 +316,6 @@ module Statement
         results << { :source => base_url+'news.shtml', :url => base_url + row.children[1]['href'], :title => row.children[1].text.split.join(' '), :date => Date.parse(row.children.first.text), :domain => "house.gov/susandavis" }
       end
       results
-    end
-    
-    def self.freshman_senators
-      results = []
-      ['markey', 'murphy','cruz'].each do |senator|
-        base_url = "http://www.#{senator}.senate.gov/"
-        doc = open_html(base_url+'press.cfm?maxrows=200&startrow=1&&type=1')
-        return if doc.nil?
-        doc.xpath("//tr")[3..-1].each do |row|
-          next if row.text.strip == ''
-          next if row.children.children[1]['href'].nil?
-          results << { :source => base_url+'press.cfm?maxrows=200&startrow=1&&type=1', :url => base_url + row.children.children[1]['href'], :title => row.children.children[1].text.strip.split.join(' '), :date => Date.strptime(row.children.children[0].text, "%m/%d/%y"), :domain => "#{senator}.senate.gov" }
-        end
-      end
-      results.flatten
     end
     
     def self.klobuchar
