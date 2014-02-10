@@ -301,6 +301,7 @@ module Statement
       doc = open_html(url)
       return if doc.nil?
       doc.xpath("//li")[40..48].each do |row|
+        next if not row.text.include?('Posted')
         results << { :source => url, :url => base_url + row.children[1]['href'], :title => row.children[1].children.text.strip, :date => Date.parse(row.children[3].text.strip), :domain => "chabot.house.gov" }
       end
       results
