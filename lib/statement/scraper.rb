@@ -493,6 +493,20 @@ module Statement
       end
       results
     end
+
+    def self.clark(year=Date.today.year)
+      results = []
+      domain = 'katherineclark.house.gov'
+      url = "http://katherineclark.house.gov/index.cfm/press-releases?MonthDisplay=0&YearDisplay=#{year}"
+      doc = open_html(url)
+      return if doc.nil?
+      (doc/:tr)[1..-1].each do |row|
+        puts row.children.first.text
+        next if row.children.first.text == 'Date'
+        results << { :source => url, :date => Date.parse(row.children.first.text), :title => row.children[2].children.text, :url => row.children[2].children[0]['href'], :domain => domain}
+      end
+      results
+    end
     
     def self.document_query(page=1)
       results = []
