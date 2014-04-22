@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot]
     end
     
     def self.committee_methods
@@ -40,7 +40,7 @@ module Statement
       year = Date.today.year
       results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, lujan, palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
-        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards, culberson].flatten
+        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards, culberson_chabot(page=1)].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -48,7 +48,7 @@ module Statement
     def self.backfill_from_scrapers
       results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3), 
         document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21), 
-        boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013)
+        boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot(page=2)
         ].flatten
       Utils.remove_generic_urls!(results)
     end
@@ -521,21 +521,22 @@ module Statement
       results
     end
 
-    def self.culberson
+    def self.culberson_chabot(page=1)
       results = []
-      domain = 'culberson.house.gov'
-      url = "http://culberson.house.gov/news/documentquery.aspx?DocumentTypeID=2573"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.css('ul.UnorderedNewsList li').each do |row|
-        link = "http://culberson.house.gov/news/" + row.children[1]['href']
-        title = row.children[1].text.strip
-        date = Date.parse(row.children[3].text.strip)
-        results << { :source => url, :title => title, :url => link, :date => date, :domain => domain }
+      domains = [{'culberson.house.gov' => 2573}, {'chabot.house.gov' => 2508}]
+      domains.each do |domain|
+        doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
+        return if doc.nil?
+        doc.css('ul.UnorderedNewsList li').each do |row|
+          link = "http://"+domain.keys.first+"/news/" + row.children[1]['href']
+          title = row.children[1].text.strip
+          date = Date.parse(row.children[3].text.strip)
+          results << { :source => "http://"+domain.keys.first+"/news/"+"documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}", :title => title, :url => link, :date => date, :domain => domain }
+        end
       end
-      results
+      results.flatten
     end
-    
+
     def self.document_query(page=1)
       results = []
       domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}]
