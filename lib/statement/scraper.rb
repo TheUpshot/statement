@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson]
     end
     
     def self.committee_methods
@@ -40,7 +40,7 @@ module Statement
       year = Date.today.year
       results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, lujan, palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
-        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards].flatten
+        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards, culberson].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -517,6 +517,21 @@ module Statement
       table = (doc/:table)[4]
       (table/:tr).each do |row|
         results << { :source => url, :url => "http://donnaedwards.house.gov/"+row.children.children[1]['href'], :title => row.children.children[1].text.strip, :date => Date.parse(row.children.children[3].text.strip)}
+      end
+      results
+    end
+
+    def self.culberson
+      results = []
+      domain = 'culberson.house.gov'
+      url = "http://culberson.house.gov/news/documentquery.aspx?DocumentTypeID=2573"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.css('ul.UnorderedNewsList li').each do |row|
+        link = "http://culberson.house.gov/news/" + row.children[1]['href']
+        title = row.children[1].text.strip
+        date = Date.parse(row.children[3].text.strip)
+        results << { :source => url, :title => title, :url => link, :date => date, :domain => domain }
       end
       results
     end
