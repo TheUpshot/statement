@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards]
     end
     
     def self.committee_methods
@@ -40,7 +40,7 @@ module Statement
       year = Date.today.year
       results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, lujan, palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
-        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year)].flatten
+        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -504,6 +504,19 @@ module Statement
         puts row.children.first.text
         next if row.children.first.text == 'Date'
         results << { :source => url, :date => Date.parse(row.children.first.text), :title => row.children[2].children.text, :url => row.children[2].children[0]['href'], :domain => domain}
+      end
+      results
+    end
+
+    def self.edwards
+      results = []
+      domain = 'donnaedwards.house.gov'
+      url = "http://donnaedwards.house.gov/index.php?option=com_content&view=category&id=10&Itemid=18"
+      doc = open_html(url)
+      return if doc.nil?
+      table = (doc/:table)[4]
+      (table/:tr).each do |row|
+        results << { :source => url, :url => "http://donnaedwards.house.gov/"+row.children.children[1]['href'], :title => row.children.children[1].text.strip, :date => Date.parse(row.children.children[3].text.strip)}
       end
       results
     end
