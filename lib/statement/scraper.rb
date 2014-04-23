@@ -557,7 +557,7 @@ module Statement
         doc = open_html(url)
         return if doc.nil?
         dates = doc.xpath('//span[@class="field-content"]').map {|s| s.text if s.text.strip.include?("201")}.compact!
-        (doc/:h3).each_with_index do |row, i|
+        (doc/:h3).first(10).each_with_index do |row, i|
           date = Date.parse(dates[i])
           results << {:source => url, :url => "http://"+domain+row.children.first['href'], :title => row.children.first.text.strip, :date => date, :domain => domain}
         end
