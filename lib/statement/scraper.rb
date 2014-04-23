@@ -560,7 +560,7 @@ module Statement
         date = Date.parse(dates[i])
         results << {:source => url, :url => "http://wolf.house.gov"+row.children.first['href'], :title => row.children.first.text.strip, :date => date}
       end
-
+      results
     end
 
     def self.document_query(page=1)
