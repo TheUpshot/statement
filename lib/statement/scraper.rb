@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot, :barton]
     end
     
     def self.committee_methods
@@ -40,7 +40,7 @@ module Statement
       year = Date.today.year
       results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, lujan, palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
-        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards, culberson_chabot(page=1)].flatten
+        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards, culberson_chabot(page=1), barton].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -516,7 +516,7 @@ module Statement
       return if doc.nil?
       table = (doc/:table)[4]
       (table/:tr).each do |row|
-        results << { :source => url, :url => "http://donnaedwards.house.gov/"+row.children.children[1]['href'], :title => row.children.children[1].text.strip, :date => Date.parse(row.children.children[3].text.strip)}
+        results << { :source => url, :url => "http://donnaedwards.house.gov/"+row.children.children[1]['href'], :title => row.children.children[1].text.strip, :date => Date.parse(row.children.children[3].text.strip), :domain => domain}
       end
       results
     end
@@ -535,6 +535,18 @@ module Statement
         end
       end
       results.flatten
+    end
+
+    def self.barton
+      results = []
+      domain = 'joebarton.house.gov'
+      url = "http://joebarton.house.gov/press-releasescolumns/"
+      doc = open_html(url)
+      return if doc.nil?
+      (doc/:h3)[0..-3].each do |row|
+        results << { :source => url, :url => "http://joebarton.house.gov/"+row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.next.next.text), :domain => domain}
+      end
+      results
     end
 
     def self.document_query(page=1)
