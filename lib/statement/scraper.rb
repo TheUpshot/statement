@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot, :barton]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :lujan, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot, :barton, :wolf]
     end
     
     def self.committee_methods
@@ -40,7 +40,7 @@ module Statement
       year = Date.today.year
       results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, lujan, palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
-        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards, culberson_chabot(page=1), barton].flatten
+        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards, culberson_chabot(page=1), barton, wolf].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -48,8 +48,8 @@ module Statement
     def self.backfill_from_scrapers
       results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3), 
         document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21), 
-        boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot(page=2)
-        ].flatten
+        boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot(page=2),
+        wolf(page=1)].flatten
       Utils.remove_generic_urls!(results)
     end
     
@@ -547,6 +547,20 @@ module Statement
         results << { :source => url, :url => "http://joebarton.house.gov/"+row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.next.next.text), :domain => domain}
       end
       results
+    end
+
+    def self.wolf(page=0)
+      results = []
+      domain = 'wolf.house.gov'
+      url = "http://wolf.house.gov/media-center/press-releases?page=#{page}"
+      doc = open_html(url)
+      return if doc.nil?
+      dates = doc.xpath('//span[@class="field-content"]').map {|s| s.text if s.text.strip.include?("2014")}.compact!
+      (doc/:h3).each_with_index do |row, i|
+        date = Date.parse(dates[i])
+        results << {:source => url, :url => "http://wolf.house.gov"+row.children.first['href'], :title => row.children.first.text.strip, :date => date}
+      end
+
     end
 
     def self.document_query(page=1)
