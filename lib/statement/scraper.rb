@@ -544,7 +544,7 @@ module Statement
           link = "http://"+domain.keys.first+"/news/" + row.children[1]['href']
           title = row.children[1].text.strip
           date = Date.parse(row.children[3].text.strip)
-          results << { :source => "http://"+domain.keys.first+"/news/"+"documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}", :title => title, :url => link, :date => date, :domain => domain }
+          results << { :source => "http://"+domain.keys.first+"/news/"+"documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}", :title => title, :url => link, :date => date, :domain => domain.keys.first }
         end
       end
       results.flatten
