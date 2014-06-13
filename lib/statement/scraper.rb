@@ -616,6 +616,18 @@ module Statement
       results
     end
 
+    def self.cantor
+      results = []
+      domain = 'cantor.house.gov'
+      url = "http://cantor.house.gov/news/"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.search('h3').each do |row|
+        results << {:source => url, :url => "http://cantor.house.gov"+row.children[0]['href'], :title => row.children[0].text, :date => Date.parse(row.children.last.text), :domain => domain}        
+      end
+      results
+    end
+
     def self.document_query(page=1)
       results = []
       domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}]
