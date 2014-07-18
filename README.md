@@ -54,6 +54,8 @@ puts results.first
 {:source=>"http://blumenauer.house.gov/index.php?option=com_bca-rss-syndicator&feed_id=1", :url=>"http://blumenauer.house.gov/index.php?option=com_content&amp;view=article&amp;id=2203:blumenauer-qwe-need-a-national-system-that-speaks-to-the-transportation-challenges-of-todayq&amp;catid=66:2013-press-releases", :title=>"Blumenauer: &quot;We need a national system that speaks to the transportation challenges of ...", :date=>#<Date: 2013-04-24 ((2456407j,0s,0n),+0s,2299161j)>, :domain=>"blumenauer.house.gov"}
 ```
 
+Statement will try to parse a date if an RSS feed contains a `PubDate` element; if not it will return `nil`.
+
 If you have a batch of RSS URLs, you can pass them to Feed's `batch` class method, which will use Typhoeus to fetch them in parallel and returns a two-element array of results and failed urls:
 
 ```ruby
