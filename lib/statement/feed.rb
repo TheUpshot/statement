@@ -41,6 +41,8 @@ module Statement
         Date.parse(link.xpath('pubDate').text)
       elsif !link.xpath('pubdate').empty?
         Date.parse(link.xpath('pubdate').text)
+      elsif link.xpath('link').text.include?("mikulski.senate.gov") and link.xpath('link').text.include?("-2014")
+        Date.parse(link.xpath('link').text.split('/').last.split('-', -1).first(3).join('/').split('.cfm').first)
       else
         nil
       end
