@@ -262,22 +262,20 @@ module Statement
       results = []
       year = Date.today.year if not year
       month = 0 if not month
-      domains = ['crenshaw.house.gov', 'www.ronjohnson.senate.gov/public/','www.moran.senate.gov/public/','www.risch.senate.gov/public/']
+      domains = ['crenshaw.house.gov', 'www.ronjohnson.senate.gov/public/','www.risch.senate.gov/public/']
       domains.each do |domain|
         if domain == 'crenshaw.house.gov' or domain == 'www.risch.senate.gov/public/'
           url = "http://"+domain + "/index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
-        elsif domain == 'www.moran.senate.gov/public/'
-          url = "http://"+domain + "index.cfm/news-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
         else
           url = "http://"+domain + "index.cfm/press-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
         end
-        doc = open_html(url)
+        doc = Statement::Scraper.open_html(url)
         return if doc.nil?
         doc.xpath("//tr")[2..-1].each do |row|
           date_text, title = row.children.map{|c| c.text.strip}.reject{|c| c.empty?}
           next if date_text == 'Date' or date_text.size > 10
           date = Date.parse(date_text)
-          results << { :source => url, :url => row.children[2].children.first['href'], :title => title, :date => date, :domain => domain }
+          results << { :source => url, :url => row.children[3].children.first['href'], :title => title, :date => date, :domain => domain }
         end
       end
       results.flatten
