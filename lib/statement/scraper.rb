@@ -488,9 +488,9 @@ module Statement
       doc = open_html(url)
       return if doc.nil?
       (doc/:tr)[1..-1].each do |row|
-        puts row.children.first.text
-        next if row.children.first.text == 'Date'
-        results << { :source => url, :date => Date.parse(row.children.first.text), :title => row.children[3].children.text, :url => row.children[3].children[0]['href'], :domain => domain}
+        puts row.children[1].text
+        next if row.children[1].text.strip == 'Date'
+        results << { :source => url, :date => Date.parse(row.children[1].text.strip), :title => row.children[3].children.text, :url => row.children[3].children[0]['href'], :domain => domain}
       end
       results
     end
