@@ -377,7 +377,7 @@ module Statement
       doc = open_html(url)
       return if doc.nil?
       doc.xpath("//tr").each do |row|
-        results << { :source => url, :url => base_url + row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children[0].text.strip.gsub('-','/')), :domain => "crapo.senate.gov" }
+        results << { :source => url, :url => base_url + row.children[3].children[0]['href'], :title => row.children[3].text.strip, :date => Date.parse(row.children[1].text.strip.gsub('-','/')), :domain => "crapo.senate.gov" }
       end
       results
     end
