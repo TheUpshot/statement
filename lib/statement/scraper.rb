@@ -452,7 +452,7 @@ module Statement
       return if doc.nil?
       doc.xpath("//tr")[1..-1].each do |row|
         next if row.text.strip.size < 30
-        results << { :source => url, :url => row.children[2].children[0]['href'].strip, :title => row.children[2].text, :date => Date.strptime(row.children[0].text, "%m/%d/%y"), :domain => domain}
+        results << { :source => url, :url => row.children[3].children[0]['href'].strip, :title => row.children[3].text, :date => Date.strptime(row.children[1].text, "%m/%d/%y"), :domain => domain}
       end
       results
     end
