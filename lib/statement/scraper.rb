@@ -38,7 +38,7 @@ module Statement
     
     def self.member_scrapers
       year = Date.today.year
-      results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar, palazzo(page=1), roe(page=1), billnelson(year=year), 
+      results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
         sessions(year=year), gabbard, pryor].flatten
@@ -318,16 +318,16 @@ module Statement
       results
     end
     
-    def self.klobuchar
+    def self.klobuchar(year)
       results = []
       base_url = "http://www.klobuchar.senate.gov/"
-      [2012,2013].each do |year|
+      [year.to_i-1,year.to_i].each do |year|
         year_url = base_url + "public/news-releases?MonthDisplay=0&YearDisplay=#{year}"
         doc = open_html(year_url)
         return if doc.nil?
         doc.xpath("//tr")[1..-1].each do |row|
-          next if row.children[2].children[0].text.strip == 'Title'
-          results << { :source => year_url, :url => row.children[2].children[0]['href'], :title => row.children[2].children[0].text.strip, :date => Date.strptime(row.children[0].text, "%m/%d/%y"), :domain => "klobuchar.senate.gov" }
+          next if row.children[3].children[0].text.strip == 'Title'
+          results << { :source => year_url, :url => row.children[3].children[0]['href'], :title => row.children[3].children[0].text.strip, :date => Date.strptime(row.children[1].text, "%m/%d/%y"), :domain => "klobuchar.senate.gov" }
         end
       end
       results
