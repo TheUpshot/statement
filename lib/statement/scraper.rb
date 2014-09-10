@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :reid, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard]
     end
     
     def self.committee_methods
@@ -40,7 +40,7 @@ module Statement
       year = Date.today.year
       results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
-        vitter(year=year), inhofe(year=year), reid, fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
+        vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
         sessions(year=year), gabbard, pryor].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
@@ -453,18 +453,6 @@ module Statement
       doc.xpath("//tr")[1..-1].each do |row|
         next if row.text.strip.size < 30
         results << { :source => url, :url => row.children[3].children[0]['href'].strip, :title => row.children[3].text, :date => Date.strptime(row.children[1].text, "%m/%d/%y"), :domain => domain}
-      end
-      results
-    end
-    
-    def self.reid
-      results = []
-      url = "http://www.reid.senate.gov/newsroom/press_releases.cfm"
-      domain = "www.reid.senate.gov"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath("//table[@id='CS_PgIndex_21891_21893']//tr")[1..-1].each do |row|
-        results << { :source => url, :url => "http://www.reid.senate.gov"+row.children[0].children[0]['href'], :title => row.children[0].children[0].text, :date => Date.parse(row.children[0].children[2].text), :domain => domain}
       end
       results
     end
