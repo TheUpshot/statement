@@ -401,7 +401,7 @@ module Statement
       return if doc.nil?
       doc.xpath("//tr")[2..-1].each do |row|
         next if row.text[0..3] == "Date"
-        results << { :source => url, :url => row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.strptime(row.children[0].text.strip, "%m/%d/%y"), :domain => "coburn.senate.gov" }
+        results << { :source => url, :url => row.children[3].children[0]['href'], :title => row.children[3].text.strip, :date => Date.strptime(row.children[1].text.strip, "%m/%d/%y"), :domain => "coburn.senate.gov" }
       end
       results
     end
