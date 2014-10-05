@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa]
     end
     
     def self.committee_methods
@@ -41,7 +41,7 @@ module Statement
       results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
-        sessions(year=year), gabbard, pryor, ellison(page=0)].flatten
+        sessions(year=year), gabbard, pryor, ellison(page=0), costa].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -611,6 +611,30 @@ module Statement
       doc.xpath("//div[@class='views-field views-field-created datebar']").each do |row|
         next if row.nil?
         results << { :source => url, :url => "http://ellison.house.gov" + row.next.next.children[1].children[0]['href'], :title => row.next.next.children[1].children[0].text.strip, :date => Date.parse(row.text.strip), :domain => domain}
+      end
+      results
+    end
+
+    def self.costa
+      results = []
+      domain = 'costa.house.gov'
+      url = "http://costa.house.gov/index.php/newsroom30/press-releases12"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//div[@class='nspArt']").each do |row|
+        results << { :source => url, :url => "http://costa.house.gov" + row.children[0].children[1].children[0]['href'], :title => row.children[0].children[1].children[0].text.strip, :date => Date.parse(row.children[0].children[0].text), :domain => domain}
+      end
+      results
+    end
+
+    def self.clawson(page=1)
+      results = []
+      domain = "clawson.house.gov"
+      url = "http://clawson.house.gov/news/documentquery.aspx?DocumentTypeID=2641"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//div[@class='middlecopy']//li").each do |row|
+        results << { :source => url, :url => "http://clawson.house.gov/news/" + row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain }
       end
       results
     end
