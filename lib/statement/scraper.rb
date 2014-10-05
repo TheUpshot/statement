@@ -627,6 +627,22 @@ module Statement
       results
     end
 
+    def self.farr(year=2014)
+      results = []
+      domain = 'www.farr.house.gov'
+      if year == 2014
+        url = "http://www.farr.house.gov/index.php/newsroom/press-releases"
+      else
+        url = "http://www.farr.house.gov/index.php/newsroom/press-releases-archive/#{year.to_s}-press-releases"
+      end
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//tr[@class='cat-list-row0']").each do |row|
+        results << { :source => url, :url => "http://farr.house.gov" + row.children[1].children[1]['href'], :title => row.children[1].children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain}
+      end
+      results
+    end
+
     def self.document_query(page=1)
       results = []
       domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}, {"clawson.house.gov" => 2641}]
