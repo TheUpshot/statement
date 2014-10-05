@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :clawson]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa]
     end
     
     def self.committee_methods
@@ -41,7 +41,7 @@ module Statement
       results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
-        sessions(year=year), gabbard, pryor, ellison(page=0), costa, clawson].flatten
+        sessions(year=year), gabbard, pryor, ellison(page=0), costa].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -627,26 +627,14 @@ module Statement
       results
     end
 
-    def self.clawson(page=1)
-      results = []
-      domain = "clawson.house.gov"
-      url = "http://clawson.house.gov/news/documentquery.aspx?DocumentTypeID=2641"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath("//div[@class='middlecopy']//li").each do |row|
-        results << { :source => url, :url => "http://clawson.house.gov/news/" + row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain }
-      end
-      results
-    end
-
     def self.document_query(page=1)
       results = []
-      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}]
+      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}, {"clawson.house.gov" => 2641}]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
         return if doc.nil?
-        doc.xpath("//span[@class='middlecopy']").each do |row|
-          results << { :source => "http://"+domain.keys.first+"/news/"+"documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}", :url => "http://"+domain.keys.first+"/news/" + row.children[6]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[4].text.strip), :domain => domain.keys.first }
+        doc.xpath("//div[@class='middlecopy']//li").each do |row|
+          results << { :source => "http://"+domain.keys.first+"/news/"+"documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}", :url => "http://"+domain.keys.first+"/news/" + row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain.keys.first }
         end
       end
       results.flatten
