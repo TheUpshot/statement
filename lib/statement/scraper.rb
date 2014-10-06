@@ -29,7 +29,7 @@ module Statement
     end
     
     def self.member_methods
-      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr]
+      [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock]
     end
     
     def self.committee_methods
@@ -41,7 +41,7 @@ module Statement
       results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year), 
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
-        sessions(year=year), gabbard, pryor, ellison(page=0), costa, farr].flatten
+        sessions(year=year), gabbard, pryor, ellison(page=0), costa, farr, mcclintock].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -639,6 +639,18 @@ module Statement
       return if doc.nil?
       doc.xpath("//tr[@class='cat-list-row0']").each do |row|
         results << { :source => url, :url => "http://farr.house.gov" + row.children[1].children[1]['href'], :title => row.children[1].children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain}
+      end
+      results
+    end
+
+    def self.mcclintock
+      results = []
+      domain = 'mcclintock.house.gov'
+      url = "http://mcclintock.house.gov/press-all.shtml"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.css("ul li").first(152).each do |row|
+        results << { :source => url, :url => row.children[0].children[1]['href'], :title => row.children[0].children[1].text.strip, :date => Date.parse(row.children[0].children[0].text), :domain => domain}
       end
       results
     end
