@@ -65,6 +65,5 @@ module Statement
       end
       Utils.remove_generic_urls!(results)
     end
-    
   end
 end
