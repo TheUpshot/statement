@@ -6,7 +6,7 @@ require 'nokogiri'
 
 module Statement
   class Scraper
-    
+
     def self.open_html(url)
       begin
         Nokogiri::HTML(open(url).read)
@@ -14,47 +14,47 @@ module Statement
         nil
       end
     end
-    
+
     def self.house_gop(url)
       doc = open_html(url)
       return unless doc
       uri = URI.parse(url)
       date = Date.parse(uri.query.split('=').last)
       links = doc.xpath("//ul[@id='membernews']").search('a')
-      results = links.map do |link| 
+      results = links.map do |link|
         abs_link = Utils.absolute_link(url, link["href"])
         { :source => url, :url => abs_link, :title => link.text.strip, :date => date, :domain => URI.parse(link["href"]).host }
       end
       Utils.remove_generic_urls!(results)
     end
-    
+
     def self.member_methods
       [:capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson]
     end
-    
+
     def self.committee_methods
       [:senate_approps_majority, :senate_approps_minority, :senate_banking, :senate_hsag_majority, :senate_hsag_minority, :senate_indian, :senate_aging, :senate_smallbiz_minority, :senate_intel, :house_energy_minority, :house_homeland_security_minority, :house_judiciary_majority, :house_rules_majority, :house_ways_means_majority]
     end
-    
+
     def self.member_scrapers
       year = Date.today.year
-      results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year), 
+      results = [capuano, cold_fusion(year, 0), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
         document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
         sessions(year=year), gabbard, pryor, ellison(page=0), costa, farr, mcclintock, olson, mcnerney].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
-    
+
     def self.backfill_from_scrapers
-      results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3), 
-        document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21), 
+      results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3),
+        document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21),
         boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot_grisham(page=2),
-        wolf_sherman_mccaul(page=1), sessions(year=2013), pryor(page=1), ellison(page=1), ellison(page=2), ellison(page=3), farr(year=2013), farr(year=2012), farr(year=2011), 
-        mcnerney(page-2), mcnerney(page=3), mcnerney(page=4), mcnerney(page=5), mcnerney(page=6), olson(year=2013)].flatten
+        wolf_sherman_mccaul(page=1), sessions(year=2013), pryor(page=1), ellison(page=1), ellison(page=2), ellison(page=3), farr(year=2013), farr(year=2012), farr(year=2011),
+        mcnerney(page=2), mcnerney(page=3), mcnerney(page=4), mcnerney(page=5), mcnerney(page=6), olson(year=2013)].flatten
       Utils.remove_generic_urls!(results)
     end
-    
+
     def self.committee_scrapers
       year = Date.today.year
       results = [senate_approps_majority, senate_approps_minority, senate_banking(year), senate_hsag_majority(year), senate_hsag_minority(year),
@@ -62,9 +62,9 @@ module Statement
          house_judiciary_majority, house_rules_majority, house_ways_means_majority].flatten
       Utils.remove_generic_urls!(results)
     end
-    
+
     ## special cases for committees without RSS feeds
-    
+
     def self.senate_approps_majority
       results = []
       url = "http://www.appropriations.senate.gov/news.cfm"
@@ -77,7 +77,7 @@ module Statement
       end
       results
     end
-    
+
     def self.senate_approps_minority
       results = []
       url = "http://www.appropriations.senate.gov/republican.cfm"
@@ -90,7 +90,7 @@ module Statement
       end
       results
     end
-    
+
     def self.senate_banking(year=Date.today.year)
       results = []
       url = "http://www.banking.senate.gov/public/index.cfm?FuseAction=Newsroom.PressReleases&ContentRecordType_id=b94acc28-404a-4fc6-b143-a9e15bf92da4&Region_id=&Issue_id=&MonthDisplay=0&YearDisplay=#{year}"
@@ -101,7 +101,7 @@ module Statement
       end
       results
     end
-    
+
     def self.senate_hsag_majority(year=Date.today.year)
       results = []
       url = "http://www.hsgac.senate.gov/media/majority-media?year=#{year}"
@@ -113,7 +113,7 @@ module Statement
       end
       results
     end
-    
+
     def self.senate_hsag_minority(year=Date.today.year)
       results = []
       url = "http://www.hsgac.senate.gov/media/minority-media?year=#{year}"
@@ -125,7 +125,7 @@ module Statement
       end
       results
     end
-    
+
     def self.senate_indian
       results = []
       url = "http://www.indian.senate.gov/news/index.cfm"
@@ -136,7 +136,7 @@ module Statement
       end
       results
     end
-    
+
     def self.senate_aging
       results = []
       url = "http://www.aging.senate.gov/pressroom.cfm?maxrows=100&startrow=1&&type=1"
@@ -147,18 +147,18 @@ module Statement
       end
       results
     end
-    
+
     def self.senate_smallbiz_minority
       results = []
       url = "http://www.sbc.senate.gov/public/index.cfm?p=RepublicanPressRoom"
       doc = open_html(url)
-      return if doc.nil?      
+      return if doc.nil?
       doc.xpath("//ul[@class='recordList']").each do |row|
         results << { :source => url, :url => row.children[0].children[2].children[0]['href'], :title => row.children[0].children[2].children[0].text, :date => Date.parse(row.children[0].children[0].text), :domain => "http://www.sbc.senate.gov/", :party => 'minority' }
       end
       results
     end
-    
+
     def self.senate_intel(congress=113, start_year=2013, end_year=2014)
       results = []
       url = "http://www.intelligence.senate.gov/press/releases.cfm?congress=#{congress}&y1=#{start_year}&y2=#{end_year}"
@@ -169,7 +169,7 @@ module Statement
       end
       results
     end
-    
+
     def self.house_energy_minority
       results = []
       url = "http://democrats.energycommerce.house.gov/index.php?q=news-releases"
@@ -180,7 +180,7 @@ module Statement
       end
       results
     end
-    
+
     def self.house_homeland_security_minority
       results = []
       url = "http://chsdemocrats.house.gov/press/index.asp?subsection=1"
@@ -191,7 +191,7 @@ module Statement
       end
       results
     end
-    
+
     def self.house_judiciary_majority
       results = []
       url = "http://judiciary.house.gov/news/press2013.html"
@@ -203,7 +203,7 @@ module Statement
       end
       results
     end
-    
+
     def self.house_rules_majority
       results = []
       url = "http://www.rules.house.gov/News/Default.aspx"
@@ -215,7 +215,7 @@ module Statement
       end
       results
     end
-    
+
     def self.house_ways_means_majority
       results = []
       url = "http://waysandmeans.house.gov/news/documentquery.aspx?DocumentTypeID=1496"
@@ -227,9 +227,9 @@ module Statement
       end
       results
     end
-    
+
     ## special cases for members without RSS feeds
-    
+
     def self.swalwell(page=1)
       results = []
       url = "http://swalwell.house.gov/category/press-releases/page/#{page}/"
@@ -250,7 +250,7 @@ module Statement
       doc.xpath("//a").select{|l| !l['href'].nil? and l['href'].include?('/pr')}[1..-5].each do |link|
         begin
           year = link['href'].split('/').first
-          date = Date.parse(link.text.split(' ').first+'/'+year) 
+          date = Date.parse(link.text.split(' ').first+'/'+year)
         rescue
           date = nil
         end
@@ -258,7 +258,7 @@ module Statement
       end
       return results[0..-5]
     end
-    
+
     def self.cold_fusion(year=Date.today.year, month=0)
       results = []
       year = Date.today.year if not year
@@ -281,7 +281,7 @@ module Statement
       end
       results.flatten
     end
-    
+
     def self.conaway(page=1)
       results = []
       base_url = "http://conaway.house.gov/news/"
@@ -293,7 +293,7 @@ module Statement
       end
       results
     end
-    
+
     def self.chabot(year=Date.today.year)
       results = []
       base_url = "http://chabot.house.gov/news/"
@@ -306,7 +306,7 @@ module Statement
       end
       results
     end
-    
+
     def self.susandavis
       results = []
       base_url = "http://www.house.gov/susandavis/"
@@ -318,7 +318,7 @@ module Statement
       end
       results
     end
-    
+
     def self.klobuchar(year)
       results = []
       base_url = "http://www.klobuchar.senate.gov/"
@@ -333,7 +333,7 @@ module Statement
       end
       results
     end
-    
+
     def self.lujan
       results = []
       base_url = 'http://lujan.house.gov/'
@@ -345,7 +345,7 @@ module Statement
       end
       results
     end
-    
+
     def self.billnelson(year=2013)
       results = []
       base_url = "http://www.billnelson.senate.gov/news/"
@@ -357,7 +357,7 @@ module Statement
       end
       results
     end
-    
+
     # fetches the latest 1000 releases, can be altered
     def self.lautenberg(rows=1000)
       results = []
@@ -370,7 +370,7 @@ module Statement
       end
       results
     end
-    
+
     def self.crapo
       results = []
       base_url = "http://www.crapo.senate.gov/media/newsreleases/"
@@ -394,7 +394,7 @@ module Statement
       end
       results
     end
-    
+
     def self.coburn(year=Date.today.year)
       results = []
       url = "http://www.coburn.senate.gov/public/index.cfm?p=PressReleases&ContentType_id=d741b7a7-7863-4223-9904-8cb9378aa03a&Group_id=7a55cb96-4639-4dac-8c0c-99a4a227bd3a&MonthDisplay=0&YearDisplay=#{year}"
@@ -406,7 +406,7 @@ module Statement
       end
       results
     end
-    
+
     def self.boxer(start=1)
       results = []
       url = "http://www.boxer.senate.gov/en/press/releases.cfm?start=#{start}"
@@ -418,7 +418,7 @@ module Statement
       end
       results
     end
-    
+
     def self.vitter(year=Date.today.year)
       results = []
       url = "http://www.vitter.senate.gov/newsroom/"
@@ -431,7 +431,7 @@ module Statement
       end
       results
     end
-    
+
     def self.donnelly(year=Date.today.year)
       results = []
       url = "http://www.donnelly.senate.gov/newsroom/"
@@ -444,7 +444,7 @@ module Statement
       end
       results
     end
-    
+
     def self.inhofe(year=Date.today.year)
       results = []
       url = "http://www.inhofe.senate.gov/newsroom/press-releases?year=#{year}"
@@ -457,7 +457,7 @@ module Statement
       end
       results
     end
-    
+
     def self.palazzo(page=1)
       results = []
       domain = "palazzo.house.gov"
@@ -598,7 +598,7 @@ module Statement
       doc = open_html(url)
       return if doc.nil?
       doc.css('ul.fc_leading li').each do |row|
-        results << {:source => url, :url => "http://gabbard.house.gov"+row.children[0].children[1]['href'], :title => row.children[0].children[1].text.strip, :date => Date.parse(row.children[2].text), :domain => domain}        
+        results << {:source => url, :url => "http://gabbard.house.gov"+row.children[0].children[1]['href'], :title => row.children[0].children[1].text.strip, :date => Date.parse(row.children[2].text), :domain => domain}
       end
       results
     end
@@ -692,6 +692,17 @@ module Statement
       end
       results.flatten
     end
-    
+
+    def self.backfill_bilirakis
+      results = []
+      domain = 'bilirakis.house.gov'
+      url = 'http://bilirakis.house.gov/press-releases/'
+      doc = open_html(url)
+      return if doc.nil?
+      doc.css("ul li[@class='article articleright']").each do |row|
+        results << {:source => url, :url => 'http://bilirakis.house.gov' + row.children[3].children[1]['href'], :title => row.children[3].text.strip, :date => Date.parse(row.children[5].text), :domain => domain }
+      end
+    end
+
   end
 end
