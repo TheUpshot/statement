@@ -29,7 +29,7 @@ module Statement
     end
 
     def self.member_methods
-      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :donnelly, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson]
+      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson]
     end
 
     def self.committee_methods
@@ -39,8 +39,8 @@ module Statement
     def self.member_scrapers
       year = Date.today.year
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
-        document_query(page=1), document_query(page=2), swalwell(page=1), donnelly(year=year), crapo, coburn, boxer(start=1),
-        vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
+        document_query(page=1), document_query(page=2), swalwell(page=1), crapo, coburn, boxer(start=1),
+        vitter(year=year), inhofe(year=2014), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
         sessions(year=year), gabbard, pryor, ellison(page=0), costa, farr, mcclintock, olson, mcnerney].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
@@ -459,6 +459,7 @@ module Statement
       results
     end
 
+    # deprecated
     def self.donnelly(year=Date.today.year)
       results = []
       url = "http://www.donnelly.senate.gov/newsroom/"
@@ -478,9 +479,11 @@ module Statement
       domain = "www.inhofe.senate.gov"
       doc = open_html(url)
       return if doc.nil?
-      doc.xpath("//tr")[1..-1].each do |row|
-        next if row.text.strip.size < 30
-        results << { :source => url, :url => row.children[3].children[0]['href'].strip, :title => row.children[3].text, :date => Date.strptime(row.children[1].text, "%m/%d/%y"), :domain => domain}
+      if doc.xpath("//tr")[1..-1]
+        doc.xpath("//tr")[1..-1].each do |row|
+          next if row.text.strip.size < 30
+          results << { :source => url, :url => row.children[3].children[0]['href'].strip, :title => row.children[3].text, :date => Date.strptime(row.children[1].text, "%m/%d/%y"), :domain => domain}
+        end
       end
       results
     end
