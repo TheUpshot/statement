@@ -2,7 +2,7 @@ require 'uri'
 
 module Utils
   def self.absolute_link(url, link)
-    return link if link =~ /^http:\/\//
+    return link if link =~ /^http/
     ("http://"+URI.parse(url).host + "/"+link).to_s
   end
 
