@@ -29,7 +29,7 @@ module Statement
     end
 
     def self.member_methods
-      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :lautenberg, :crapo, :coburn, :boxer, :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :wolf_sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson]
+      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer, :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson]
     end
 
     def self.committee_methods
@@ -40,8 +40,8 @@ module Statement
       year = Date.today.year
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, coburn, boxer(start=1),
-        vitter(year=year), inhofe(year=2014), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, wolf_sherman_mccaul, welch,
-        sessions(year=year), gabbard, pryor, ellison(page=0), costa, farr, mcclintock, olson, mcnerney].flatten
+        vitter(year=year), inhofe(year=2014), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
+        sessions(year=year), gabbard, ellison(page=0), costa, farr, mcclintock, olson, mcnerney].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -50,7 +50,7 @@ module Statement
       results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3),
         document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21),
         boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot_grisham(page=2),
-        wolf_sherman_mccaul(page=1), sessions(year=2013), pryor(page=1), ellison(page=1), ellison(page=2), ellison(page=3), farr(year=2013), farr(year=2012), farr(year=2011),
+        sherman_mccaul(page=1), sessions(year=2013), pryor(page=1), ellison(page=1), ellison(page=2), ellison(page=3), farr(year=2013), farr(year=2012), farr(year=2011),
         mcnerney(page=2), mcnerney(page=3), mcnerney(page=4), mcnerney(page=5), mcnerney(page=6), olson(year=2013)].flatten
       Utils.remove_generic_urls!(results)
     end
@@ -579,9 +579,9 @@ module Statement
       results
     end
 
-    def self.wolf_sherman_mccaul(page=0)
+    def self.sherman_mccaul(page=0)
       results = []
-      domains = ['wolf.house.gov', 'sherman.house.gov', 'mccaul.house.gov']
+      domains = ['sherman.house.gov', 'mccaul.house.gov']
       domains.each do |domain|
         url = "http://#{domain}/media-center/press-releases?page=#{page}"
         doc = open_html(url)
@@ -593,20 +593,6 @@ module Statement
         end
       end
       results.flatten
-    end
-
-    def self.pryor(page=0)
-      results = []
-      domain = 'www.pryor.senate.gov'
-      url = "http://www.pryor.senate.gov/newsroom/press-releases?page=#{page}"
-      doc = open_html(url)
-      return if doc.nil?
-      dates = doc.xpath('//span[@class="field-content"]').map {|s| s.text if s.text.strip.include?("201")}.compact!
-      doc.xpath('//div[@class="views-field views-field-title"]').each_with_index do |row, i|
-        date = Date.parse(dates[i])
-        results << {:source => url, :url => "http://www.pryor.senate.gov"+row.children[1].children[0]['href'], :title => row.children[1].children[0].text.strip, :date => date, :domain => domain}
-      end
-      results
     end
 
     def self.welch
