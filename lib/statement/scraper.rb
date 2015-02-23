@@ -41,7 +41,7 @@ module Statement
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=2014), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
-        sessions(year=year), gabbard, ellison(page=0), costa, farr, mcclintock, olson, mcnerney].flatten
+        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
