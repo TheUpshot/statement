@@ -29,7 +29,7 @@ module Statement
     end
 
     def self.member_methods
-      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer, :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer]
+      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer, :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn]
     end
 
     def self.committee_methods
@@ -41,7 +41,7 @@ module Statement
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=2014), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
-        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer].flatten
+        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10)].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -718,6 +718,23 @@ module Statement
       rows = (doc/:table/:tr).select{|r| !r.children[3].nil?}
       rows.each do |row|
         results << {:source => url, :url => row.children[3].children[1]['href'].strip, :title => row.children[3].text.strip, :date => Date.parse(row.children[1].text.strip), :domain => domain }
+      end
+      results
+    end
+
+    def self.lamborn(limit=nil)
+      results = []
+      domain = 'lamborn.house.gov'
+      url = "http://lamborn.house.gov/2015-press-releases/"
+      doc = open_html(url)
+      return if doc.nil?
+      links = (doc/:h3).map{|h| { "http://lamborn.house.gov"+h.children[1]['href'] => h.text.strip} }
+      links = links.first(limit) if limit
+      links.each do |link|
+        page = open_html(link.keys.first)
+        print_path = page.search("a").detect{|a| a['onclick'] && a['onclick'].include?('popup')}['onclick'].split("'")[1]
+        print_page = open_html("http://lamborn.house.gov"+print_path)
+        results << {:source => url, :url => link.keys.first, :title => link.values.first, :date => Date.parse(print_page.xpath('//*[@class="PopupNewsDetailsDate"]').text), :domain => domain }
       end
       results
     end
