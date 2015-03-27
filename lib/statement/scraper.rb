@@ -358,7 +358,7 @@ module Statement
       results = []
       base_url = "http://poe.house.gov"
       month_url = base_url + "/press-releases?MonthDisplay=#{month}&YearDisplay=#{year}"
-      doc = open_html(year_url)
+      doc = open_html(month_url)
       return if doc.nil?
       doc.xpath("//tr")[1..-1].each do |row|
         next if row.children[3].children[0].text.strip == 'Title'
