@@ -38,7 +38,7 @@ module Statement
 
     def self.date_from_rss_item(link)
       if !link.xpath('pubDate').text.empty?
-        Date.parse(link.xpath('pubDate').text)
+         Date.parse(link.xpath('pubDate').text)
       elsif !link.xpath('pubdate').empty?
         Date.parse(link.xpath('pubdate').text)
       elsif link.xpath('link').text.include?("mikulski.senate.gov") and link.xpath('link').text.include?("-2014")

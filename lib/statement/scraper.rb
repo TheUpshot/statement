@@ -29,7 +29,7 @@ module Statement
     end
 
     def self.member_methods
-      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer, :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson]
+      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer, :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer]
     end
 
     def self.committee_methods
@@ -41,7 +41,7 @@ module Statement
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=2014), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
-        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney].flatten
+        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -51,7 +51,7 @@ module Statement
         document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21),
         boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot_grisham(page=2),
         sherman_mccaul(page=1), sessions(year=2013), pryor(page=1), ellison(page=1), ellison(page=2), ellison(page=3), farr(year=2013), farr(year=2012), farr(year=2011),
-        mcnerney(page=2), mcnerney(page=3), mcnerney(page=4), mcnerney(page=5), mcnerney(page=6), olson(year=2013)].flatten
+        mcnerney(page=2), mcnerney(page=3), mcnerney(page=4), mcnerney(page=5), mcnerney(page=6), olson(year=2013), schumer(page=2), schumer(page=3)].flatten
       Utils.remove_generic_urls!(results)
     end
 
@@ -707,6 +707,19 @@ module Statement
         end
       end
       results.flatten
+    end
+
+    def self.schumer(page=1)
+      results = []
+      domain = 'www.schumer.senate.gov'
+      url = "http://www.schumer.senate.gov/newsroom/press-releases/table?PageNum_rs=#{page}"
+      doc = open_html(url)
+      return if doc.nil?
+      rows = (doc/:table/:tr).select{|r| !r.children[3].nil?}
+      rows.each do |row|
+        results << {:source => url, :url => row.children[3].children[1]['href'].strip, :title => row.children[3].text.strip, :date => Date.parse(row.children[1].text.strip), :domain => domain }
+      end
+      results
     end
 
     def self.backfill_bilirakis
