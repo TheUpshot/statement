@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier]
+      :bennie_thompson, :speier, :poe]
     end
 
     def self.committee_methods
@@ -43,8 +43,9 @@ module Statement
       year = Date.today.year
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, coburn, boxer(start=1),
-        vitter(year=year), inhofe(year=2014), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
-        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson, speier].flatten
+        vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
+        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
+        poe(year=year, month=0)].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -54,7 +55,8 @@ module Statement
         document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21),
         boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot_grisham(page=2),
         sherman_mccaul(page=1), sessions(year=2013), pryor(page=1), ellison(page=1), ellison(page=2), ellison(page=3), farr(year=2013), farr(year=2012), farr(year=2011),
-        mcnerney(page=2), mcnerney(page=3), mcnerney(page=4), mcnerney(page=5), mcnerney(page=6), olson(year=2013), schumer(page=2), schumer(page=3)].flatten
+        mcnerney(page=2), mcnerney(page=3), mcnerney(page=4), mcnerney(page=5), mcnerney(page=6), olson(year=2013), schumer(page=2), schumer(page=3), poe(year=2015, month=2),
+        poe(year=2015, month=1)].flatten
       Utils.remove_generic_urls!(results)
     end
 
@@ -347,6 +349,20 @@ module Statement
         doc.xpath("//tr")[1..-1].each do |row|
           next if row.children[3].children[0].text.strip == 'Title'
           results << { :source => year_url, :url => row.children[3].children[0]['href'], :title => row.children[3].children[0].text.strip, :date => Date.strptime(row.children[1].text, "%m/%d/%y"), :domain => "klobuchar.senate.gov" }
+        end
+      end
+      results
+    end
+
+    def self.poe(year, month=0)
+      results = []
+      base_url = "http://poe.house.gov"
+      month_url = base_url + "/press-releases?MonthDisplay=#{month}&YearDisplay=#{year}"
+        doc = open_html(year_url)
+        return if doc.nil?
+        doc.xpath("//tr")[1..-1].each do |row|
+          next if row.children[3].children[0].text.strip == 'Title'
+          results << { :source => month_url, :url => base_url + row.children[3].children[0]['href'], :title => row.children[3].children[0].text.strip, :date => Date.strptime(row.children[1].text, "%m/%d/%y"), :domain => "poe.house.gov" }
         end
       end
       results
