@@ -358,12 +358,11 @@ module Statement
       results = []
       base_url = "http://poe.house.gov"
       month_url = base_url + "/press-releases?MonthDisplay=#{month}&YearDisplay=#{year}"
-        doc = open_html(year_url)
-        return if doc.nil?
-        doc.xpath("//tr")[1..-1].each do |row|
-          next if row.children[3].children[0].text.strip == 'Title'
-          results << { :source => month_url, :url => base_url + row.children[3].children[0]['href'], :title => row.children[3].children[0].text.strip, :date => Date.strptime(row.children[1].text, "%m/%d/%y"), :domain => "poe.house.gov" }
-        end
+      doc = open_html(year_url)
+      return if doc.nil?
+      doc.xpath("//tr")[1..-1].each do |row|
+        next if row.children[3].children[0].text.strip == 'Title'
+        results << { :source => month_url, :url => base_url + row.children[3].children[0]['href'], :title => row.children[3].children[0].text.strip, :date => Date.strptime(row.children[1].text, "%m/%d/%y"), :domain => "poe.house.gov" }
       end
       results
     end
