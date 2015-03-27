@@ -29,7 +29,10 @@ module Statement
     end
 
     def self.member_methods
-      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer, :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden]
+      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :susandavis, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
+      :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
+      :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden,
+      :bennie_thompson]
     end
 
     def self.committee_methods
@@ -41,7 +44,7 @@ module Statement
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, susandavis, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, coburn, boxer(start=1),
         vitter(year=year), inhofe(year=2014), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
-        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden].flatten
+        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -735,6 +738,18 @@ module Statement
       return if doc.nil?
       doc.xpath('//*[@id="centerbox"]/div[1]/ul/li').each do |row|
         results << {:source => url, :url => 'http://walden.house.gov' + row.children[3].children[1]['href'], :title => row.children[3].text.strip, :date => Date.parse(row.children[5].text), :domain => domain }
+      end
+      results
+    end
+
+    def self.bennie_thompson
+      results = []
+      domain = "benniethompson.house.gov"
+      url = "http://benniethompson.house.gov/index.php?option=com_content&view=category&id=41&Itemid=148"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath('//*[@id="adminForm"]/table/tbody/tr').each do |row|
+        results << {:source => url, :url => 'http://benniethompson.house.gov' + row.children[1].children[1]['href'], :title => row.children[1].children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain }
       end
       results
     end
