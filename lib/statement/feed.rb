@@ -7,7 +7,7 @@ require 'typhoeus'
 
 module Statement
   class Feed
-    
+
     def self.batch(urls)
       results = []
       failures = []
@@ -27,7 +27,7 @@ module Statement
       hydra.run
       [results.flatten, failures]
     end
-  
+
     def self.open_rss(url)
       begin
         Nokogiri::XML(open(url))
@@ -35,7 +35,7 @@ module Statement
         nil
       end
     end
-    
+
     def self.date_from_rss_item(link)
       if !link.xpath('pubDate').text.empty?
         Date.parse(link.xpath('pubDate').text)
@@ -53,7 +53,7 @@ module Statement
       return unless doc
       parse_rss(doc, url)
     end
-    
+
     def self.parse_rss(doc, url)
       links = doc.xpath('//item')
       return if links.empty?
