@@ -334,18 +334,6 @@ module Statement
       results
     end
 
-    def self.susandavis
-      results = []
-      base_url = "http://www.house.gov/susandavis/"
-      doc = open_html(base_url+'news.shtml')
-      return if doc.nil?
-      doc.search("ul")[6].children.each do |row|
-        next if row.text.strip == ''
-        results << { :source => base_url+'news.shtml', :url => base_url + row.children[1]['href'], :title => row.children[1].text.split.join(' '), :date => Date.parse(row.children.first.text), :domain => "house.gov/susandavis" }
-      end
-      results
-    end
-
     def self.klobuchar(year)
       results = []
       base_url = "http://www.klobuchar.senate.gov/"
