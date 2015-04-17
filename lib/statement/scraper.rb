@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier, :poe]
+      :bennie_thompson, :speier, :poe, :grassley]
     end
 
     def self.committee_methods
@@ -42,7 +42,7 @@ module Statement
     def self.member_scrapers
       year = Date.today.year
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
-        document_query(page=1), document_query(page=2), swalwell(page=1), crapo, coburn, boxer(start=1),
+        document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer(start=1), grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
         sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
         poe(year=year, month=0)].flatten
@@ -52,7 +52,7 @@ module Statement
 
     def self.backfill_from_scrapers
       results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3),
-        document_query(page=4), coburn(year=2012), coburn(year=2011), coburn(year=2010), boxer(start=11), boxer(start=21),
+        document_query(page=4), boxer(start=11), boxer(start=21), grassley(page=1), grassley(page=2), grassley(page=3),
         boxer(start=31), boxer(start=41), vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot_grisham(page=2),
         sherman_mccaul(page=1), sessions(year=2013), pryor(page=1), ellison(page=1), ellison(page=2), ellison(page=3), farr(year=2013), farr(year=2012), farr(year=2011),
         mcnerney(page=2), mcnerney(page=3), mcnerney(page=4), mcnerney(page=5), mcnerney(page=6), olson(year=2013), schumer(page=2), schumer(page=3), poe(year=2015, month=2),
@@ -428,14 +428,13 @@ module Statement
       results
     end
 
-    def self.coburn(year=Date.today.year)
+    def self.grassley(page=0)
       results = []
-      url = "http://www.coburn.senate.gov/public/index.cfm?p=PressReleases&ContentType_id=d741b7a7-7863-4223-9904-8cb9378aa03a&Group_id=7a55cb96-4639-4dac-8c0c-99a4a227bd3a&MonthDisplay=0&YearDisplay=#{year}"
+      url = "http://www.grassley.senate.gov/news/news-releases?title=&tid=All&date[value]&page=#{page}"
       doc = open_html(url)
       return if doc.nil?
-      doc.xpath("//tr")[2..-1].each do |row|
-        next if row.text.strip[0..3] == "Date"
-        results << { :source => url, :url => row.children[3].children[0]['href'], :title => row.children[3].text.strip, :date => Date.strptime(row.children[1].text.strip, "%m/%d/%y"), :domain => "coburn.senate.gov" }
+      doc.xpath("//div[@class='views-field views-field-field-release-date']").each do |row|
+        results << { :source => url, :url => "http://www.grassley.senate.gov" + row.next.next.children[1].children[0]['href'], :title => row.next.next.text.strip, :date => Date.parse(row.text.strip), :domain => "grassley.senate.gov" }
       end
       results
     end
