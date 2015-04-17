@@ -284,10 +284,11 @@ module Statement
       results
     end
 
-    def self.cold_fusion(year=Date.today.year, month=nil)
+    def self.cold_fusion(year=Date.today.year, month=nil, skip_domains=[])
       results = []
       year = Date.today.year if not year
-      domains = ['www.ronjohnson.senate.gov','www.risch.senate.gov', 'www.lee.senate.gov', 'www.barrasso.senate.gov']
+      domains = ['www.ronjohnson.senate.gov','www.risch.senate.gov', 'www.lee.senate.gov', 'www.barrasso.senate.gov', 'www.heitkamp.senate.gov']
+      domains = domains - skip_domains if skip_domains
       domains.each do |domain|
         if domain == 'www.risch.senate.gov'
           if not month
@@ -310,7 +311,7 @@ module Statement
         end
         doc = Statement::Scraper.open_html(url)
         return if doc.nil?
-        if domain == 'www.lee.senate.gov' or domain == 'www.barrasso.senate.gov'
+        if domain == 'www.lee.senate.gov' or domain == 'www.barrasso.senate.gov' or domain == "www.heitkamp.senate.gov"
           rows = doc.xpath("//tr")[1..-1]
         else
           rows = doc.xpath("//tr")[2..-1]
@@ -319,7 +320,7 @@ module Statement
           date_text, title = row.children.map{|c| c.text.strip}.reject{|c| c.empty?}
           next if date_text == 'Date' or date_text.size > 10
           date = Date.parse(date_text)
-          results << { :source => url, :url => row.children[3].children.first['href'], :title => title, :date => date, :domain => domain }
+          scraped << { :source => url, :url => row.children[3].children.first['href'], :title => title, :date => date, :domain => domain }
         end
       end
       results.flatten
