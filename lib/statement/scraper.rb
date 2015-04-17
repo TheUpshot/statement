@@ -287,7 +287,7 @@ module Statement
     def self.cold_fusion(year=Date.today.year, month=nil)
       results = []
       year = Date.today.year if not year
-      domains = ['www.ronjohnson.senate.gov','www.risch.senate.gov', 'www.lee.senate.gov']
+      domains = ['www.ronjohnson.senate.gov','www.risch.senate.gov', 'www.lee.senate.gov', 'www.barrasso.senate.gov']
       domains.each do |domain|
         if domain == 'www.risch.senate.gov'
           if not month
