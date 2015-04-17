@@ -287,9 +287,9 @@ module Statement
     def self.cold_fusion(year=Date.today.year, month=nil)
       results = []
       year = Date.today.year if not year
-      domains = ['www.ronjohnson.senate.gov/public/','www.risch.senate.gov/public/']
+      domains = ['www.ronjohnson.senate.gov','www.risch.senate.gov', 'www.lee.senate.gov']
       domains.each do |domain|
-        if domain == 'www.risch.senate.gov/public/'
+        if domain == 'www.risch.senate.gov'
           if not month
             url = "http://www.risch.senate.gov/public/index.cfm/pressreleases"
           else
@@ -297,14 +297,19 @@ module Statement
           end
         else
           if not month
-            url = "http://www.ronjohnson.senate.gov/public/index.cfm/press-releases"
+            url = "http://#{domain}/public/index.cfm/press-releases"
           else
-            url = "http://www.ronjohnson.senate.gov/public/index.cfm/press-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
+            url = "http://#{domain}/public/index.cfm/press-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
           end
         end
         doc = Statement::Scraper.open_html(url)
         return if doc.nil?
-        doc.xpath("//tr")[2..-1].each do |row|
+        if domain == 'www.lee.senate.gov'
+          rows = doc.xpath("//tr")[1..-1]
+        else
+          rows = doc.xpath("//tr")[2..-1]
+        end
+        rows.each do |row|
           date_text, title = row.children.map{|c| c.text.strip}.reject{|c| c.empty?}
           next if date_text == 'Date' or date_text.size > 10
           date = Date.parse(date_text)
