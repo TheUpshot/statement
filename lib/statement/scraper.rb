@@ -320,7 +320,7 @@ module Statement
           date_text, title = row.children.map{|c| c.text.strip}.reject{|c| c.empty?}
           next if date_text == 'Date' or date_text.size > 10
           date = Date.parse(date_text)
-          scraped << { :source => url, :url => row.children[3].children.first['href'], :title => title, :date => date, :domain => domain }
+          results << { :source => url, :url => row.children[3].children.first['href'], :title => title, :date => date, :domain => domain }
         end
       end
       results.flatten
