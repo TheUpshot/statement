@@ -295,6 +295,12 @@ module Statement
           else
             url = "http://www.risch.senate.gov/public/index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
           end
+        elsif domain == 'www.barrasso.senate.gov'
+          if not month
+            url = "http://#{domain}/public/index.cfm/news-releases"
+          else
+            url = "http://#{domain}/public/index.cfm/news-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
+          end
         else
           if not month
             url = "http://#{domain}/public/index.cfm/press-releases"
@@ -304,7 +310,7 @@ module Statement
         end
         doc = Statement::Scraper.open_html(url)
         return if doc.nil?
-        if domain == 'www.lee.senate.gov'
+        if domain == 'www.lee.senate.gov' or domain == 'www.barrasso.senate.gov'
           rows = doc.xpath("//tr")[1..-1]
         else
           rows = doc.xpath("//tr")[2..-1]
