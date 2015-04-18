@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier, :poe, :grassley]
+      :bennie_thompson, :speier, :poe, :grassley, :bennet]
     end
 
     def self.committee_methods
@@ -41,11 +41,11 @@ module Statement
 
     def self.member_scrapers
       year = Date.today.year
-      results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(year=year),
+      results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(page=0),
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer(start=1), grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
         sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0)].flatten
+        poe(year=year, month=0), bennet(page=1)].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -391,14 +391,14 @@ module Statement
       results
     end
 
-    def self.billnelson(year=2013)
+    def self.billnelson(page=0)
       results = []
-      base_url = "http://www.billnelson.senate.gov/news/"
-      year_url = base_url + "media.cfm?year=#{year}"
-      doc = open_html(year_url)
+      url = "http://www.billnelson.senate.gov/newsroom/press-releases?page=#{page}"
+      doc = open_html(url)
       return if doc.nil?
-      doc.xpath('//li').each do |row|
-        results << { :source => year_url, :url => base_url + row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.children.last.text), :domain => "billnelson.senate.gov" }
+      dates = doc.xpath("//div[@class='date-box']").map{|d| Date.parse(d.children.map{|x| x.text.strip}.join(" "))}
+      (doc/:h3).each_with_index do |row, index|
+        results << { :source => url, :url => "http://www.billnelson.senate.gov" + row.children.first['href'], :title => row.children.first.text.strip, :date => dates[index], :domain => "billnelson.senate.gov" }
       end
       results
     end
@@ -735,6 +735,18 @@ module Statement
       rows = (doc/:table/:tr).select{|r| !r.children[3].nil?}
       rows.each do |row|
         results << {:source => url, :url => row.children[3].children[1]['href'].strip, :title => row.children[3].text.strip, :date => Date.parse(row.children[1].text.strip), :domain => domain }
+      end
+      results
+    end
+
+    def self.bennet(page=1)
+      results = []
+      domain = 'www.bennet.senate.gov'
+      url = "http://www.bennet.senate.gov/?p=releases&pg=#{page}"
+      doc = open_html(url)
+      return if doc.nil?
+      (doc/:h2).each do |row|
+        results << {:source => url, :url => 'http://www.bennet.senate.gov' + row.children.first['href'], :title => row.text.strip, :date => Date.parse(row.previous.previous.text), :domain => domain }
       end
       results
     end
