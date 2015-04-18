@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier, :poe, :grassley, :bennet]
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen]
     end
 
     def self.committee_methods
@@ -45,7 +45,7 @@ module Statement
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer(start=1), grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
         sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0), bennet(page=1)].flatten
+        poe(year=year, month=0), bennet(page=1), shaheen(page=1)].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
