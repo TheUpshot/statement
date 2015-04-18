@@ -751,6 +751,19 @@ module Statement
       results
     end
 
+    def self.shaheen(page=1)
+      results = []
+      domain = 'www.shaheen.senate.gov'
+      url = "http://www.shaheen.senate.gov/news/press/index.cfm?PageNum_rs=#{page}"
+      doc = open_html(url)
+      return if doc.nil?
+      (doc/:ul)[3].children.each do |row|
+        next if row.text.strip == ''
+        results << {:source => url, :url => row.children[2].children[0]['href'], :title => row.children[2].text.strip, :date => Date.parse(row.children.first.text), :domain => domain }
+      end
+      results
+    end
+
     def self.lamborn(limit=nil)
       results = []
       domain = 'lamborn.house.gov'
