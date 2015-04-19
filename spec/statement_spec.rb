@@ -61,4 +61,21 @@ describe Statement do
     @results.map{|r| r[:domain]}.uniq.must_equal ["www.vitter.senate.gov"]    
   end
   
+  it "scrapes sanford's press page" do
+    @sanford_url = "http://sanford.house.gov/media-center/press-releases?page=0"
+    @sanford_page = File.new(File.join(File.dirname(__FILE__), 'sanford_press.html'))
+    WebMock.stub_request(:any, @sanford_url).to_return(:body => @sanford_page, :status => 200)
+
+    expected_result = {
+      :source => "http://sanford.house.gov/media-center/press-releases?page=0",
+      :url    => "http://sanford.house.gov/media-center/press-releases/sanford-announces-public-schedule-for-april-18th-19th",
+      :title  => "Sanford Announces Public Schedule for April 18th - 19th",
+      :date   => Date.parse("2015-04-17"),
+      :domain => "sanford.house.gov"
+    }
+
+    @results = Scraper.sanford(0)
+    @results.length.must_equal 10
+    @results.first.must_equal expected_result
+  end
 end
