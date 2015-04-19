@@ -6,9 +6,17 @@ That doesn't mean that writing member-specific scrapers is particularly difficul
 
 ### Setup
 
-1. Ruby: if you don't have it, install Ruby (version 2.x) and `gem install bundler`
+1. Ruby: if you don't have it, install Ruby (version 2.x) and run `gem install bundler` from the command line.
 2. Fork the [repository](https://github.com/TheUpshot/statement) and clone it to a directory on your computer.
 3. cd into that directory and run `bundle install` to install the gems used by Statement.
+4. Enter the Ruby console by typing `irb` and then require the libraries we'll need:
+
+```ruby
+require 'uri'
+require 'open-uri'
+require 'american_date'
+require 'nokogiri'
+```
 
 ### Scraper Design
 
