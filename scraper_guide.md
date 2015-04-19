@@ -17,6 +17,7 @@ require 'open-uri'
 require 'american_date'
 require 'nokogiri'
 ```
+5. Pick a lawmaker that needs a scraper written from [our issues page](https://github.com/TheUpshot/statement/issues).
 
 ### Scraper Design
 
