@@ -79,6 +79,7 @@ describe Statement do
     @results.first.must_equal expected_result
   end
 
+<<<<<<< HEAD
   it "scrapes perlmutter's press page" do
     @perlmutter_url = "http://perlmutter.house.gov/index.php/media-center/press-releases-86821"
     @perlmutter_page = File.new(File.join(File.dirname(__FILE__), 'ed_perlmutter_press.html'))
@@ -132,4 +133,20 @@ describe Statement do
     @results.first.must_equal expected_result
   end
 
+  it "scrapes keating's press page" do
+    @keating_url = "http://keating.house.gov/index.php?option=com_content&view=category&id=14&Itemid=13"
+    @keating_page = File.new(File.join(File.dirname(__FILE__), 'keating_press.html'))
+    WebMock.stub_request(:any, @keating_url).to_return(:body => @keating_page, :status => 200)
+
+    expected_result = {
+      :source => "http://keating.house.gov/index.php?option=com_content&view=category&id=14&Itemid=13",
+      :url    => "http://keating.house.gov/index.php?option=com_content&view=article&id=314:keating-announces-epa-grant-for-new-bedford&catid=14&Itemid=13",
+      :title  => "Keating Announces EPA Grant for New Bedford",
+      :date   => Date.parse("2015-03-13"),
+      :domain => "keating.house.gov"
+    }
+
+    @results = Scraper.keating
+    @results.first.must_equal expected_result
+  end
 end
