@@ -31,8 +31,8 @@ module Statement
     def self.member_methods
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
-      :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer,
-      :lamborn, :walden, :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :sanford, :perlmutter]
+      :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden,
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :sanford, :butterfield]
     end
 
     def self.committee_methods
@@ -45,7 +45,7 @@ module Statement
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
         sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0), bennet(page=1), shaheen(page=1), sanford(page=0), perlmutter].flatten
+        poe(year=year, month=0), bennet(page=1), shaheen(page=1), sanford(page=0), perlmutter, butterfield].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -864,6 +864,23 @@ module Statement
 
       doc.css("#adminForm tr")[0..-1].each do |row|
         results << { :source => url, :url => "http://" + domain + row.children[1].children[1]['href'], :title => row.children[1].children[1].text.strip, :date => Date.parse(row.children[3].text), :domain => domain}
+      end
+      results
+    end
+
+    def self.butterfield(page=0)
+      results = []
+      domain = "butterfield.house.gov"
+      source_url = "http://#{domain}/media-center/press-releases?page=#{page}"
+      doc = open_html(source_url)
+      return if doc.nil?
+
+      doc.css("#region-content .views-row").each do |row|
+        title_anchor = row.css("h3 a")
+        title = title_anchor.text
+        release_url = "http://#{domain + title_anchor.attr('href')}"
+        raw_date = row.css(".views-field-created .field-content").text
+        results << { :source => source_url, :url => release_url, :title => title, :date => Date.parse(raw_date), :domain => domain }
       end
       results
     end
