@@ -79,7 +79,6 @@ describe Statement do
     @results.first.must_equal expected_result
   end
 
-<<<<<<< HEAD
   it "scrapes perlmutter's press page" do
     @perlmutter_url = "http://perlmutter.house.gov/index.php/media-center/press-releases-86821"
     @perlmutter_page = File.new(File.join(File.dirname(__FILE__), 'ed_perlmutter_press.html'))
