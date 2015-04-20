@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :sanford, :butterfield]
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :sanford, :butterfield, :brady]
     end
 
     def self.committee_methods
@@ -45,7 +45,7 @@ module Statement
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
         sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0), bennet(page=1), shaheen(page=1), sanford(page=0), perlmutter, butterfield].flatten
+        poe(year=year, month=0), bennet(page=1), shaheen(page=1), sanford(page=0), perlmutter, butterfield, brady].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -881,6 +881,22 @@ module Statement
         release_url = "http://#{domain + title_anchor.attr('href')}"
         raw_date = row.css(".views-field-created .field-content").text
         results << { :source => source_url, :url => release_url, :title => title, :date => Date.parse(raw_date), :domain => domain }
+      end
+      results
+    end
+
+    def self.brady(page=1)
+      results = []
+      domain = "kevinbrady.house.gov"
+      source_url = "http://#{domain}/news/documentquery.aspx?DocumentTypeID=2657&Page=#{page}"
+      doc = open_html(source_url)
+      return if doc.nil?
+
+      doc.css(".UnorderedNewsList li").each do |row|
+        title = row.children[1].children.text.strip
+        date = Date.parse(row.children[3].text.strip)
+        page_slug = row.children[1].attributes['href'].value
+        results << { :source => source_url, :url => "http://#{domain}/news/#{page_slug}", :title => title, :date => date, :domain => domain}
       end
       results
     end
