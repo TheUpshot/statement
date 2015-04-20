@@ -854,5 +854,22 @@ module Statement
       end
       results
     end
+
+    def self.brady(page=1)
+      results = []
+      domain = "kevinbrady.house.gov"
+      source_url = "http://#{domain}/news/documentquery.aspx?DocumentTypeID=2657&Page=#{page}"
+      doc = open_html(source_url)
+      return if doc.nil?
+
+      doc.css(".UnorderedNewsList li").each do |row|
+        title = row.children[1].children.text.strip
+        date = Date.parse(row.children[3].text.strip)
+        page_slug = row.children[1].attributes['href'].value
+        results << { :source => source_url, :url => "http://#{domain}/news/#{page_slug}", :title => title, :date => date, :domain => domain}
+      end
+      results
+    end
+
   end
 end
