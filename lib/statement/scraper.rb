@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :sanford]
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :sanford. :keating]
     end
 
     def self.committee_methods
@@ -45,7 +45,7 @@ module Statement
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
         sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0), bennet(page=1), shaheen(page=1), sanford(page=0)].flatten
+        poe(year=year, month=0), bennet(page=1), shaheen(page=1), sanford(page=0), keating].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -854,5 +854,21 @@ module Statement
       end
       results
     end
+
+    def self.keating
+      results = []
+      domain = "keating.house.gov"
+      source_url = "http://#{domain}/index.php?option=com_content&view=category&id=14&Itemid=13"
+      doc = open_html(source_url)
+      return if doc.nil?
+
+      doc.css("#adminForm tr")[0..-1].each do |row|
+        url = 'http://' + domain + row.children[1].children[1]['href']
+        title = row.children[1].children[1].text.strip
+        results << { :source => source_url, :url => url, :title => title, :date => Date.parse(row.children[3].text), :domain => domain}
+      end
+      results
+    end
+
   end
 end
