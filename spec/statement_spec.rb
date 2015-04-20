@@ -95,4 +95,23 @@ describe Statement do
     @results = Scraper.perlmutter
     @results.first.must_equal expected_result
   end
+
+  it "scrapes butterfield's press page" do
+    @butterfield_url = "http://butterfield.house.gov/media-center/press-releases?page=0"
+    @butterfield_page = File.new(File.join(File.dirname(__FILE__), 'butterfield_press.html'))
+    WebMock.stub_request(:any, @butterfield_url).to_return(:body => @butterfield_page, :status => 200)
+
+    expected_result = {
+      :source => "http://butterfield.house.gov/media-center/press-releases?page=0",
+      :url    => "http://butterfield.house.gov/media-center/press-releases/north-carolina-delegation-introduces-bipartisan-highway-bill-for",
+      :title  => "North Carolina Delegation Introduces Bipartisan Highway Bill for Military Corridor",
+      :date   => Date.parse("2015-04-16"),
+      :domain => "butterfield.house.gov"
+    }
+
+    @results = Scraper.butterfield(0)
+    @results.length.must_equal 10
+    @results.first.must_equal expected_result
+  end
+
 end
