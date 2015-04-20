@@ -148,4 +148,22 @@ describe Statement do
     @results = Scraper.keating
     @results.first.must_equal expected_result
   end
+
+  it "scrapes walz's press page" do
+    @walz_url = "http://walz.house.gov/media-center/press-releases?page=0"
+    @walz_page = File.new(File.join(File.dirname(__FILE__), 'walz_press.html'))
+    WebMock.stub_request(:any, @walz_url).to_return(:body => @walz_page, :status => 200)
+
+    expected_result = {
+      :source => "http://walz.house.gov/media-center/press-releases?page=0",
+      :url    => "http://walz.house.gov/media-center/press-releases/walz-calls-for-passage-of-the-paycheck-fairness-act-on-equal-pay-day-0",
+      :title  => "Walz Calls for Passage of the Paycheck Fairness Act on Equal Pay Day",
+      :date   => Date.parse("2015-04-14"),
+      :domain => "walz.house.gov"
+    }
+
+    @results = Scraper.walz(0)
+    @results.length.must_equal 10
+    @results.first.must_equal expected_result
+  end
 end
