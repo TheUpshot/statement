@@ -854,5 +854,23 @@ module Statement
       end
       results
     end
+
+    def self.butterfield(page=0)
+      results = []
+      domain = "butterfield.house.gov"
+      source_url = "http://#{domain}/media-center/press-releases?page=#{page}"
+      doc = open_html(source_url)
+      return if doc.nil?
+
+      doc.css("#region-content .views-row").each do |row|
+        title_anchor = row.css("h3 a")
+        title = title_anchor.text
+        release_url = "http://#{domain + title_anchor.attr('href')}"
+        raw_date = row.css(".views-field-created .field-content").text
+        results << { :source => source_url, :url => release_url, :title => title, :date => Date.parse(raw_date), :domain => domain }
+      end
+      results
+    end
+
   end
 end
