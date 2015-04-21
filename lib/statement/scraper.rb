@@ -31,8 +31,8 @@ module Statement
     def self.member_methods
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
-      :sherman_mccaul, :welch, :sessions, :gabbard, :ellison, :costa, :farr, :mcclintock, :mcnerney, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :sanford, :butterfield, :brady, :keating, :walz]
+      :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :lamborn, :walden,
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :brady, :keating, :drupal]
     end
 
     def self.committee_methods
@@ -43,9 +43,9 @@ module Statement
       year = Date.today.year
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(page=0),
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0),
-        vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, sherman_mccaul, welch,
-        sessions(year=year), gabbard, ellison(page=0), costa, farr, olson, mcnerney, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0), bennet(page=1), shaheen(page=1), sanford(page=0), perlmutter, butterfield, brady, keating, walz(page=0)].flatten
+        vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
+        sessions(year=year), gabbard, costa, farr, olson, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
+        poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, brady, keating, drupal].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -54,8 +54,8 @@ module Statement
       results = [cold_fusion(2012, 0), cold_fusion(2011, 0), cold_fusion(2010, 0), billnelson(year=2012), document_query(page=3),
         document_query(page=4), grassley(page=1), grassley(page=2), grassley(page=3),
         vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot_grisham(page=2),
-        sherman_mccaul(page=1), sessions(year=2013), pryor(page=1), ellison(page=1), ellison(page=2), ellison(page=3), farr(year=2013), farr(year=2012), farr(year=2011),
-        mcnerney(page=2), mcnerney(page=3), mcnerney(page=4), mcnerney(page=5), mcnerney(page=6), olson(year=2013), schumer(page=2), schumer(page=3), poe(year=2015, month=2),
+        sessions(year=2013), pryor(page=1), farr(year=2013), farr(year=2012), farr(year=2011),
+        olson(year=2013), schumer(page=2), schumer(page=3), poe(year=2015, month=2),
         poe(year=2015, month=1)].flatten
       Utils.remove_generic_urls!(results)
     end
@@ -597,22 +597,6 @@ module Statement
       results
     end
 
-    def self.sherman_mccaul(page=0)
-      results = []
-      domains = ['sherman.house.gov', 'mccaul.house.gov']
-      domains.each do |domain|
-        url = "http://#{domain}/media-center/press-releases?page=#{page}"
-        doc = open_html(url)
-        return if doc.nil?
-        dates = doc.xpath('//span[@class="field-content"]').map {|s| s.text if s.text.strip.include?("201")}.compact!
-        (doc/:h3).first(10).each_with_index do |row, i|
-          date = Date.parse(dates[i])
-          results << {:source => url, :url => "http://"+domain+row.children.first['href'], :title => row.children.first.text.strip, :date => date, :domain => domain}
-        end
-      end
-      results.flatten
-    end
-
     def self.welch
       results = []
       domain = 'welch.house.gov'
@@ -633,19 +617,6 @@ module Statement
       return if doc.nil?
       doc.css('ul.fc_leading li').each do |row|
         results << {:source => url, :url => "http://gabbard.house.gov"+row.children[0].children[1]['href'], :title => row.children[0].children[1].text.strip, :date => Date.parse(row.children[2].text), :domain => domain}
-      end
-      results
-    end
-
-    def self.ellison(page=0)
-      results = []
-      domain = 'ellison.house.gov'
-      url = "http://ellison.house.gov/media-center/press-releases?page=#{page}"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath("//div[@class='views-field views-field-created datebar']").each do |row|
-        next if row.nil?
-        results << { :source => url, :url => "http://ellison.house.gov" + row.next.next.children[1].children[0]['href'], :title => row.next.next.children[1].children[0].text.strip, :date => Date.parse(row.text.strip), :domain => domain}
       end
       results
     end
@@ -698,18 +669,6 @@ module Statement
       return if doc.nil?
       (doc/:h3).each do |row|
         results << {:source => url, :url => 'http://olson.house.gov' + row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.next.next.text), :domain => domain }
-      end
-      results
-    end
-
-    def self.mcnerney(page=1)
-      results = []
-      domain = 'mcnerney.house.gov'
-      url = "http://mcnerney.house.gov/media-center/press-releases"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath("//div[@class='views-field views-field-title']").each do |row|
-        results << {:source => url, :url => 'http://mcnerney.house.gov' + row.children[1].children[0]['href'], :title => row.children[1].children[0].text.strip, :date => Date.parse(row.next.next.text.strip), :domain => domain }
       end
       results
     end
@@ -838,23 +797,6 @@ module Statement
 
     end
 
-    def self.sanford(page=0)
-      results = []
-      domain = "sanford.house.gov"
-      source_url = "http://#{domain}/media-center/press-releases?page=#{page}"
-      doc = open_html(source_url)
-      return if doc.nil?
-
-      doc.css("#region-content .views-row").each do |row|
-        title_anchor = row.css("h3 a")
-        title = title_anchor.text
-        release_url = "http://#{domain + title_anchor.attr('href')}"
-        raw_date = row.css(".views-field-created .field-content").text
-        results << { :source => source_url, :url => release_url, :title => title, :date => Date.parse(raw_date), :domain => domain }
-      end
-      results
-    end
-
     def self.perlmutter
       results = []
       domain = "perlmutter.house.gov"
@@ -864,23 +806,6 @@ module Statement
 
       doc.css("#adminForm tr")[0..-1].each do |row|
         results << { :source => url, :url => "http://" + domain + row.children[1].children[1]['href'], :title => row.children[1].children[1].text.strip, :date => Date.parse(row.children[3].text), :domain => domain}
-      end
-      results
-    end
-
-    def self.butterfield(page=0)
-      results = []
-      domain = "butterfield.house.gov"
-      source_url = "http://#{domain}/media-center/press-releases?page=#{page}"
-      doc = open_html(source_url)
-      return if doc.nil?
-
-      doc.css("#region-content .views-row").each do |row|
-        title_anchor = row.css("h3 a")
-        title = title_anchor.text
-        release_url = "http://#{domain + title_anchor.attr('href')}"
-        raw_date = row.css(".views-field-created .field-content").text
-        results << { :source => source_url, :url => release_url, :title => title, :date => Date.parse(raw_date), :domain => domain }
       end
       results
     end
@@ -916,21 +841,47 @@ module Statement
       results
     end
 
-    def self.walz(page=0)
-      results = []
-      domain = "walz.house.gov"
-      source_url = "http://#{domain}/media-center/press-releases?page=#{page}"
-      doc = open_html(source_url)
-      return if doc.nil?
-
-      doc.css("#region-content .views-row").each do |row|
-        title_anchor = row.css("h3 a")
-        title = title_anchor.text
-        release_url = "http://#{domain + title_anchor.attr('href')}"
-        raw_date = row.css(".views-field-created .field-content").text
-        results << { :source => source_url, :url => release_url, :title => title, :date => Date.parse(raw_date), :domain => domain }
+    def self.drupal(urls=[], page=0)
+      if urls.empty?
+        urls = [
+            "http://sherman.house.gov/media-center/press-releases",
+            "http://mccaul.house.gov/media-center/press-releases",
+            "https://ellison.house.gov/media-center/press-releases",
+            "http://mcnerney.house.gov/media-center/press-releases",
+            "http://sanford.house.gov/media-center/press-releases",
+            "http://butterfield.house.gov/media-center/press-releases",
+            "http://walz.house.gov/media-center/press-releases",
+            "https://pingree.house.gov/media-center/press-releases",
+            "http://sarbanes.house.gov/media-center/press-releases",
+            "http://wilson.house.gov/media-center/press-releases",
+            "https://bilirakis.house.gov/press-releases"
+        ]
       end
+
+      results = []
+
+      urls.each do |url|
+        source_url = "#{url}?page=#{page}"
+
+        domain =  URI.parse(source_url).host
+        doc = open_html(source_url)
+        return if doc.nil?
+
+        doc.css("#region-content .views-row").each do |row|
+            title_anchor = row.css("h3 a")
+            title = title_anchor.text
+            release_url = "http://#{domain + title_anchor.attr('href')}"
+            raw_date = row.css(".views-field-created").text
+            results << { :source => source_url,
+                         :url => release_url,
+                         :title => title,
+                         :date => Date.parse(raw_date),
+                         :domain => domain }
+        end
+      end
+
       results
+
     end
 
   end
