@@ -134,3 +134,4 @@ If you write a new scraper, please use Nokogiri for parsing - see some of the ex
 * Derek Willis
 * Jacob Harris
 * [Sam Sweeney](https://github.com/shubik22)
+* [Mick O'Brien](https://github.com/mickaobrien)
