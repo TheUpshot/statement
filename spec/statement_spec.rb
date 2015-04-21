@@ -61,24 +61,6 @@ describe Statement do
     @results.map{|r| r[:domain]}.uniq.must_equal ["www.vitter.senate.gov"]
   end
 
-  it "scrapes sanford's press page" do
-    @sanford_url = "http://sanford.house.gov/media-center/press-releases?page=0"
-    @sanford_page = File.new(File.join(File.dirname(__FILE__), 'sanford_press.html'))
-    WebMock.stub_request(:any, @sanford_url).to_return(:body => @sanford_page, :status => 200)
-
-    expected_result = {
-      :source => "http://sanford.house.gov/media-center/press-releases?page=0",
-      :url    => "http://sanford.house.gov/media-center/press-releases/sanford-announces-public-schedule-for-april-18th-19th",
-      :title  => "Sanford Announces Public Schedule for April 18th - 19th",
-      :date   => Date.parse("2015-04-17"),
-      :domain => "sanford.house.gov"
-    }
-
-    @results = Scraper.sanford(0)
-    @results.length.must_equal 10
-    @results.first.must_equal expected_result
-  end
-
   it "scrapes perlmutter's press page" do
     @perlmutter_url = "http://perlmutter.house.gov/index.php/media-center/press-releases-86821"
     @perlmutter_page = File.new(File.join(File.dirname(__FILE__), 'ed_perlmutter_press.html'))
@@ -93,24 +75,6 @@ describe Statement do
     }
 
     @results = Scraper.perlmutter
-    @results.first.must_equal expected_result
-  end
-
-  it "scrapes butterfield's press page" do
-    @butterfield_url = "http://butterfield.house.gov/media-center/press-releases?page=0"
-    @butterfield_page = File.new(File.join(File.dirname(__FILE__), 'butterfield_press.html'))
-    WebMock.stub_request(:any, @butterfield_url).to_return(:body => @butterfield_page, :status => 200)
-
-    expected_result = {
-      :source => "http://butterfield.house.gov/media-center/press-releases?page=0",
-      :url    => "http://butterfield.house.gov/media-center/press-releases/north-carolina-delegation-introduces-bipartisan-highway-bill-for",
-      :title  => "North Carolina Delegation Introduces Bipartisan Highway Bill for Military Corridor",
-      :date   => Date.parse("2015-04-16"),
-      :domain => "butterfield.house.gov"
-    }
-
-    @results = Scraper.butterfield(0)
-    @results.length.must_equal 10
     @results.first.must_equal expected_result
   end
 
@@ -149,21 +113,22 @@ describe Statement do
     @results.first.must_equal expected_result
   end
 
-  it "scrapes walz's press page" do
-    @walz_url = "http://walz.house.gov/media-center/press-releases?page=0"
-    @walz_page = File.new(File.join(File.dirname(__FILE__), 'walz_press.html'))
-    WebMock.stub_request(:any, @walz_url).to_return(:body => @walz_page, :status => 200)
+  it "scrapes a drupal press page" do
+      @drupal_url = "http://walz.house.gov/media-center/press-releases"
+      @drupal_page = File.new(File.join(File.dirname(__FILE__), 'drupal_press.html'))
+      puts @drupal_page
+      WebMock.stub_request(:any, "#{@drupal_url}?page=0").to_return(:body => @drupal_page, :status => 200)
 
-    expected_result = {
-      :source => "http://walz.house.gov/media-center/press-releases?page=0",
-      :url    => "http://walz.house.gov/media-center/press-releases/walz-calls-for-passage-of-the-paycheck-fairness-act-on-equal-pay-day-0",
-      :title  => "Walz Calls for Passage of the Paycheck Fairness Act on Equal Pay Day",
-      :date   => Date.parse("2015-04-14"),
-      :domain => "walz.house.gov"
-    }
+      expected_result = {
+          :source => "http://walz.house.gov/media-center/press-releases?page=0",
+          :url    => "http://walz.house.gov/media-center/press-releases/walz-calls-for-passage-of-the-paycheck-fairness-act-on-equal-pay-day-0",
+          :title  => "Walz Calls for Passage of the Paycheck Fairness Act on Equal Pay Day",
+          :date   => Date.parse("2015-04-14"),
+          :domain => "walz.house.gov"
+      }
 
-    @results = Scraper.walz(0)
-    @results.length.must_equal 10
-    @results.first.must_equal expected_result
+      @results = Scraper.drupal(urls=[@drupal_url])
+      @results.length.must_equal 10
+      @results.first.must_equal expected_result
   end
 end
