@@ -30,7 +30,7 @@ module Statement
 
     def self.member_methods
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
-      :vitter, :inhofe, :palazzo, :roe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
+      :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :lamborn, :walden,
       :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :brady, :keating, :drupal]
     end
@@ -41,7 +41,7 @@ module Statement
 
     def self.member_scrapers
       year = Date.today.year
-      results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), palazzo(page=1), roe(page=1), billnelson(page=0),
+      results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), billnelson(page=0),
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
         sessions(year=year), gabbard, costa, farr, olson, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
@@ -506,30 +506,6 @@ module Statement
       results
     end
 
-    def self.palazzo(page=1)
-      results = []
-      domain = "palazzo.house.gov"
-      url = "http://palazzo.house.gov/news/documentquery.aspx?DocumentTypeID=2519&Page=#{page}"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath("//div[@class='middlecopy']//li").each do |row|
-        results << { :source => url, :url => "http://palazzo.house.gov/news/" + row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain }
-      end
-      results
-    end
-
-    def self.roe(page=1)
-      results = []
-      domain = 'roe.house.gov'
-      url = "http://roe.house.gov/news/documentquery.aspx?DocumentTypeID=1532&Page=#{page}"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath("//div[@class='middlecopy']//li").each do |row|
-        results << { :source => url, :url => "http://roe.house.gov/news/" + row.children[1]['href'], :title => row.children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain }
-      end
-      results
-    end
-
     def self.clark(year=Date.today.year)
       results = []
       domain = 'katherineclark.house.gov'
@@ -675,7 +651,7 @@ module Statement
 
     def self.document_query(page=1)
       results = []
-      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}, {"clawson.house.gov" => 2641}]
+      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}, {"clawson.house.gov" => 2641}, {"palazzo.house.gov" => 2519}, {"roe.house.gov" => 1532}, {"perry.house.gov" => 2608}]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
         return if doc.nil?
