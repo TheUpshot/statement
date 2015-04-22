@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :brady, :keating, :drupal]
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal]
     end
 
     def self.committee_methods
@@ -45,7 +45,7 @@ module Statement
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
         sessions(year=year), gabbard, costa, farr, olson, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, brady, keating, drupal].flatten
+        poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -651,7 +651,7 @@ module Statement
 
     def self.document_query(page=1)
       results = []
-      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}, {"clawson.house.gov" => 2641}, {"palazzo.house.gov" => 2519}, {"roe.house.gov" => 1532}, {"perry.house.gov" => 2608}, {"rodneydavis.house.gov" => 2427}]
+      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}, {"clawson.house.gov" => 2641}, {"palazzo.house.gov" => 2519}, {"roe.house.gov" => 1532}, {"perry.house.gov" => 2608}, {"rodneydavis.house.gov" => 2427}, {"kevinbrady.house.gov" => 2657}]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
         return if doc.nil?
@@ -782,22 +782,6 @@ module Statement
 
       doc.css("#adminForm tr")[0..-1].each do |row|
         results << { :source => url, :url => "http://" + domain + row.children[1].children[1]['href'], :title => row.children[1].children[1].text.strip, :date => Date.parse(row.children[3].text), :domain => domain}
-      end
-      results
-    end
-
-    def self.brady(page=1)
-      results = []
-      domain = "kevinbrady.house.gov"
-      source_url = "http://#{domain}/news/documentquery.aspx?DocumentTypeID=2657&Page=#{page}"
-      doc = open_html(source_url)
-      return if doc.nil?
-
-      doc.css(".UnorderedNewsList li").each do |row|
-        title = row.children[1].children.text.strip
-        date = Date.parse(row.children[3].text.strip)
-        page_slug = row.children[1].attributes['href'].value
-        results << { :source => source_url, :url => "http://#{domain}/news/#{page_slug}", :title => title, :date => date, :domain => domain}
       end
       results
     end
