@@ -651,7 +651,7 @@ module Statement
 
     def self.document_query(page=1)
       results = []
-      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}, {"clawson.house.gov" => 2641}, {"palazzo.house.gov" => 2519}, {"roe.house.gov" => 1532}, {"perry.house.gov" => 2608}]
+      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}, {"clawson.house.gov" => 2641}, {"palazzo.house.gov" => 2519}, {"roe.house.gov" => 1532}, {"perry.house.gov" => 2608}, {"rodneydavis.house.gov" => 2427}]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
         return if doc.nil?
