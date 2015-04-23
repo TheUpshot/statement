@@ -42,7 +42,7 @@ describe Statement do
 
   it "scrapes a senate cold fusion page" do
     @url = "http://www.billnelson.senate.gov/news/media.cfm?year=2013"
-    WebMock.stub_request(:any, @url).to_return(:body => File.new(File.join(File.dirname(__FILE__), 'bill_nelson_press.html')), :status => 200)
+    WebMock.stub_request(:any, @url).with(:headers => {'Accept'=>'*/*', 'User-Agent'=>'Ruby'}).to_return(:headers => {}, :body => File.new(File.join(File.dirname(__FILE__), 'bill_nelson_press.html')), :status => 200)
     @results = Scraper.billnelson(year=2013)
     @results.last[:url].must_equal "http://www.billnelson.senate.gov/news/details.cfm?id=338190&"
   end
@@ -75,24 +75,6 @@ describe Statement do
     }
 
     @results = Scraper.perlmutter
-    @results.first.must_equal expected_result
-  end
-
-  it "scrapes brady's press page" do
-    @brady_url = "http://kevinbrady.house.gov/news/documentquery.aspx?DocumentTypeID=2657&Page=1"
-    @brady_page = File.new(File.join(File.dirname(__FILE__), 'brady_press.html'))
-    WebMock.stub_request(:any, @brady_url).to_return(:body => @brady_page, :status => 200)
-
-    expected_result = {
-      :source => "http://kevinbrady.house.gov/news/documentquery.aspx?DocumentTypeID=2657&Page=1",
-      :url    => "http://kevinbrady.house.gov/news/documentsingle.aspx?DocumentID=398977",
-      :title  => "TPA Will Benefit American Business, Consumers and Economy",
-      :date   => Date.parse("2015-04-17"),
-      :domain => "kevinbrady.house.gov"
-    }
-
-    @results = Scraper.brady(1)
-    @results.length.must_equal 10
     @results.first.must_equal expected_result
   end
 
