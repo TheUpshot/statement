@@ -17,6 +17,7 @@ module Statement
         req.on_complete do |response|
           if response.success?
             doc = Nokogiri::XML(response.body)
+            results << parse_atom(doc, url) if url == "http://larson.house.gov/index.php?option=com_ninjarsssyndicator&feed_id=1&format=raw"
             results << parse_rss(doc, url)
           else
             failures << url
@@ -51,7 +52,11 @@ module Statement
     def self.from_rss(url)
       doc = open_rss(url)
       return unless doc
-      parse_rss(doc, url)
+      if url == "http://larson.house.gov/index.php?option=com_ninjarsssyndicator&feed_id=1&format=raw"
+        parse_atom(doc, url)
+      else
+        parse_rss(doc, url)
+      end
     end
 
     def self.parse_rss(doc, url)
@@ -65,5 +70,14 @@ module Statement
       end
       Utils.remove_generic_urls!(results)
     end
+
+    def self.parse_atom(doc, url)
+      links = (doc/:entry)
+      return if links.empty?
+      results = links.map do |link|
+        { :source => url, :url => link.children[3]['href'], :title => link.children[1].text, :date => Date.parse(link.children[5].text), :domain => URI.parse(url).host }
+      end
+    end
+
   end
 end
