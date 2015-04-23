@@ -4,7 +4,7 @@ Statement parses RSS feeds and HTML pages containing press releases and other of
 
 ## Coverage
 
-Statement currently parses press releases for members of the House and Senate. For members with RSS feeds, you can pass the feed URL into Statement. For members without RSS feeds, HTML scrapers are provided, as are methods for speciality groups, such as House Republicans. Suggestions are welcomed.
+Statement currently parses press releases for members of the House and Senate. For members with RSS feeds, you can pass the feed URL into Statement. For members without RSS feeds (or with broken ones), HTML scrapers are provided, as are methods for special groups, such as House Republicans. Suggestions are welcomed.
 
 ## Installation
 
@@ -121,6 +121,8 @@ $ rake test
 
 ## Contributing
 
+Statement would not be nearly the library it is without our contributors, and we sincerely thank them for their generosity and interest in making congressional press release data more available.
+
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
@@ -131,7 +133,8 @@ If you write a new scraper, please use Nokogiri for parsing - see some of the ex
 
 ## Authors
 
-* Derek Willis
-* Jacob Harris
-* [Sam Sweeney](https://github.com/shubik22)
+* [Derek Willis](https://github.com/dwillis)
+* [Jacob Harris](https://github.com/harrisj)
 * [Mick O'Brien](https://github.com/mickaobrien)
+* [Tyler Pearson](https://github.com/tylerpearson)
+* [Sam Sweeney](https://github.com/shubik22)
