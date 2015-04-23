@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins]
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin]
     end
 
     def self.committee_methods
@@ -45,7 +45,7 @@ module Statement
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
         sessions(year=year), gabbard, costa, farr, olson, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins].flatten
+        poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins, durbin(page=1)].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -491,6 +491,18 @@ module Statement
       results
     end
 
+    def self.durbin(page=1)
+      results = []
+      url = "http://www.durbin.senate.gov/newsroom/press-releases?PageNum_rs=#{page}&"
+      domain = "www.durbin.senate.gov"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.xpath("//div[@id='press']//h2").each do |row|
+        results << { :source => url, :url => "http://www.durbin.senate.gov"+row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.previous.previous.text.gsub(".","/")), :domain => domain}
+      end
+      results
+    end
+
     def self.inhofe(year=Date.today.year)
       results = []
       url = "http://www.inhofe.senate.gov/newsroom/press-releases?year=#{year}"
@@ -651,7 +663,20 @@ module Statement
 
     def self.document_query(page=1)
       results = []
-      domains = [{"thornberry.house.gov" => 1776}, {"wenstrup.house.gov" => 2491}, {"clawson.house.gov" => 2641}, {"palazzo.house.gov" => 2519}, {"roe.house.gov" => 1532}, {"perry.house.gov" => 2608}, {"rodneydavis.house.gov" => 2427}, {"kevinbrady.house.gov" => 2657}]
+      domains = [
+        {"thornberry.house.gov" => 1776},
+        {"wenstrup.house.gov" => 2491},
+        {"clawson.house.gov" => 2641},
+        {"palazzo.house.gov" => 2519},
+        {"roe.house.gov" => 1532},
+        {"perry.house.gov" => 2608},
+        {"rodneydavis.house.gov" => 2427},
+        {"kevinbrady.house.gov" => 2657},
+        {"loudermilk.house.gov" => 27},
+        {"babin.house.gov" => 27},
+        {"bridenstine.house.gov" => 2412},
+        {"allen.house.gov" => 27}
+      ]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
         return if doc.nil?
