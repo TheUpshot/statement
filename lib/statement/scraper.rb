@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :lamborn, :walden,
-      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin]
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin_burr]
     end
 
     def self.committee_methods
@@ -45,7 +45,7 @@ module Statement
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
         sessions(year=year), gabbard, costa, farr, olson, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins, durbin(page=1)].flatten
+        poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins, durbin_burr(page=1)].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -491,14 +491,16 @@ module Statement
       results
     end
 
-    def self.durbin(page=1)
+    def self.durbin_burr(page=1)
       results = []
-      url = "http://www.durbin.senate.gov/newsroom/press-releases?PageNum_rs=#{page}&"
-      domain = "www.durbin.senate.gov"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath("//div[@id='press']//h2").each do |row|
-        results << { :source => url, :url => "http://www.durbin.senate.gov"+row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.previous.previous.text.gsub(".","/")), :domain => domain}
+      domains = ["www.durbin.senate.gov", "www.burr.senate.gov"]
+      domains.each do |domain|
+        url = "http://#{domain}/newsroom/press-releases?PageNum_rs=#{page}&"
+        doc = open_html(url)
+        return if doc.nil?
+        doc.xpath("//div[@id='press']//h2").each do |row|
+          results << { :source => url, :url => "http://#{domain}"+row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.previous.previous.text.gsub(".","/")), :domain => domain}
+        end
       end
       results
     end
@@ -677,7 +679,10 @@ module Statement
         {"bridenstine.house.gov" => 2412},
         {"allen.house.gov" => 27},
         {"davidscott.house.gov" => 377},
-        {"buddycarter.house.gov" => 27}
+        {"buddycarter.house.gov" => 27},
+        {"grothman.house.gov" => 27},
+        {"beyer.house.gov" => 27},
+        {"kathleenrice.house.gov" => 27}
       ]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
@@ -855,7 +860,8 @@ module Statement
             "http://wilson.house.gov/media-center/press-releases",
             "https://bilirakis.house.gov/press-releases",
             "http://quigley.house.gov/media-center/press-releases",
-            "https://denham.house.gov/media-center/press-releases"
+            "https://denham.house.gov/media-center/press-releases",
+            "https://sewell.house.gov/media-center/press-releases"
         ]
       end
 
