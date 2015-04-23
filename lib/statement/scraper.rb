@@ -675,7 +675,9 @@ module Statement
         {"loudermilk.house.gov" => 27},
         {"babin.house.gov" => 27},
         {"bridenstine.house.gov" => 2412},
-        {"allen.house.gov" => 27}
+        {"allen.house.gov" => 27},
+        {"davidscott.house.gov" => 377},
+        {"buddycarter.house.gov" => 27}
       ]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
@@ -852,7 +854,8 @@ module Statement
             "http://sarbanes.house.gov/media-center/press-releases",
             "http://wilson.house.gov/media-center/press-releases",
             "https://bilirakis.house.gov/press-releases",
-            "http://quigley.house.gov/media-center/press-releases"
+            "http://quigley.house.gov/media-center/press-releases",
+            "https://denham.house.gov/media-center/press-releases"
         ]
       end
 
