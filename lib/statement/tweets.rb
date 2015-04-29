@@ -2,9 +2,9 @@ require 'twitter'
 
 module Statement
   class Tweets
-    
+
     attr_accessor :client, :rest_client, :timeline, :bulk_timeline
-    
+
     def initialize
       @@config = Statement.config rescue nil || {}
       @client = Twitter::Client.new(
@@ -20,10 +20,10 @@ module Statement
           :oauth_token_secret => @@config[:oauth_token_secret] || ENV['OAUTH_TOKEN_SECRET']
         )
     end
-    
+
     # fetches single twitter user's timeline
     def timeline(member_id)
-      process_results(client.user_timeline(member_id))
+      process_results(rest_client.user_timeline(member_id))
     end
 
     # batch lookup of users, 100 at a time
@@ -34,12 +34,12 @@ module Statement
       end
       results.flatten
     end
-    
+
     # fetches latest 100 tweets from a list (derekwillis twitter acct has a public congress list)
     def bulk_timeline(list_id, list_owner=nil)
-      process_results(client.list_timeline(list_owner, list_id, {:count => 100}))
+      process_results(rest_client.list_timeline(list_owner, list_id, {:count => 100}))
     end
-    
+
     def process_results(tweets)
       results = []
       tweets.each do |tweet|
