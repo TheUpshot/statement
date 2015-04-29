@@ -42,7 +42,7 @@ module Statement
     def self.member_scrapers
       year = Date.today.year
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), billnelson(page=0),
-        document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0), boehner(page=1),
+        document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0), 
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
         sessions(year=year), gabbard, costa, farr, olson, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
         poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins, durbin_burr(page=1)].flatten
