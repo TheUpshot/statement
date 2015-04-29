@@ -43,8 +43,8 @@ module Statement
     def process_results(tweets)
       results = []
       tweets.each do |tweet|
-        url = tweet[:urls].first ? tweet[:urls].first[:expanded_url] : nil
-        results << { :id => tweet[:id], :body => tweet[:text], :link => url, :in_reply_to_screen_name => tweet[:in_reply_to_screen_name], :total_tweets => tweet[:user][:statuses_count], :created_time => tweet[:created_at], :retweets => tweet[:retweet_count], :favorites => tweet[:favorite_count], :screen_name => tweet[:user][:screen_name]}
+        url = tweet.urls.first ? tweet.urls.first.expanded_url : nil
+        results << { :id => tweet.id, :body => tweet.text, :link => url, :in_reply_to_screen_name => tweet.in_reply_to_screen_name, :total_tweets => tweet.user.statuses_count, :created_time => tweet.created_at, :retweets => tweet.retweet_count, :favorites => tweet.favorite_count, :screen_name => tweet.user.screen_name}
       end
       results
     end
