@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :lamborn, :walden, :boehner,
-      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin_burr]
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin_burr, :rand_paul]
     end
 
     def self.committee_methods
@@ -42,10 +42,11 @@ module Statement
     def self.member_scrapers
       year = Date.today.year
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), billnelson(page=0),
-        document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0), 
+        document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0),
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
         sessions(year=year), gabbard, costa, farr, olson, schumer, lamborn(limit=10), walden, bennie_thompson, speier,
-        poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins, durbin_burr(page=1)].flatten
+        poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins, durbin_burr(page=1),
+        rand_paul(page = 1)].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -415,6 +416,52 @@ module Statement
       end
       results
     end
+
+    def self.rand_paul(page = 1)
+      # each page contains a max of 20 results
+      page_url = "http://www.paul.senate.gov/news/press?PageNum_rs=#{page}"
+      doc = open_html(page_url)
+      return if doc.nil?
+      results = doc.search('#press .title').inject([]) do |arr, title|
+        article_url = URI.join(page_url, title.search('a')[0]['href'])
+        article_datestr = title.previous_element.text # e.g. "05.11.15"
+        arr << {
+          :source => page_url,
+          :url => article_url.to_s,
+          :domain => article_url.host,
+          :title => title.text,
+          :date => Date.strptime(article_datestr, '%m.%d.%y')
+        }
+      end
+
+      results
+    end
+
+
+    def self.patrick_meehan(page = 0)
+      # This is a Drupal page and it uses the View plugin, but unlike the other
+      # Drupal pages, it does not make use of .views-field-created, and instead, the
+      # only Month-Year is given (03 Feb).
+      page_url = "https://meehan.house.gov/media-center/press-releases?page=#{page}"
+      doc = open_html(page_url)
+      return if doc.nil?
+      results = doc.search('.view-congress-press-releases .views-row').inject([]) do |arr, article|
+        title = article.search('.views-field-title a')[0]
+        article_url = URI.join(page_url, title['href'])
+        raise "Date still needs to be parsed; thanks a lot Drupal"
+        article_datestr = title.previous_element.text
+        arr << {
+          :source => page_url,
+          :url => article_url.to_s,
+          :domain => article_url.host,
+          :title => title.text,
+          :date => Date.strptime(article_datestr, 'SOMETHING')
+        }
+      end
+
+      results
+    end
+
 
     # fetches the latest 1000 releases, can be altered
     def self.lautenberg(rows=1000)
