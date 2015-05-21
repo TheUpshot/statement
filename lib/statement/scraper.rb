@@ -433,7 +433,6 @@ module Statement
           :date => Date.strptime(article_datestr, '%m.%d.%y')
         }
       end
-
       results
     end
 
