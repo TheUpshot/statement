@@ -40,12 +40,29 @@ describe Statement do
     @results.last[:url].must_equal "http://www.gop.gov/republicans/other/relative_url_test.html"
   end
 
-  it "scrapes a senate cold fusion page" do
+  it "scrapes a senate cold fusion page (old bill nelson)" do
+    skip "This test no longer relevant as Bill Nelson is off of cold fusion"
     @url = "http://www.billnelson.senate.gov/news/media.cfm?year=2013"
-    WebMock.stub_request(:any, @url).with(:headers => {'Accept'=>'*/*', 'User-Agent'=>'Ruby'}).to_return(:headers => {}, :body => File.new(File.join(File.dirname(__FILE__), 'bill_nelson_press.html')), :status => 200)
+    WebMock.stub_request(:get, "http://www.billnelson.senate.gov/newsroom/press-releases?page=2013").
+       with(:headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent'=>'Ruby'}).
+       to_return(:status => 200, :body => File.new(File.join(File.dirname(__FILE__), 'bill_nelson_press-coldfusion.html')), :headers => {})
+
+
     @results = Scraper.billnelson(year=2013)
-    @results.last[:url].must_equal "http://www.billnelson.senate.gov/news/details.cfm?id=338190&"
+    @results.last[:url].must_equal "http://www.billnelson.senate.gov/newsroom/press-releases/lawmakers-call-on-feds-to-investigate-use-of-supercookies"
   end
+
+
+  it "scrapes a bill nelson page" do
+    @url = "http://www.billnelson.senate.gov/newsroom/press-releases?page=1"
+    WebMock.stub_request(:get, "http://www.billnelson.senate.gov/newsroom/press-releases?page=1").
+        to_return(:status => 200,
+                  :body => File.new(File.join(File.dirname(__FILE__), 'bill_nelson_press.html')), :headers => {})
+
+    @results = Scraper.billnelson(page = 1)
+    @results.last[:url].must_equal "http://www.billnelson.senate.gov/newsroom/press-releases/lawmakers-call-on-feds-to-investigate-use-of-supercookies"
+  end
+
 
   it "scrapes vitter pages for 2013" do
     @vitter = "http://www.vitter.senate.gov/newsroom/press?year=2013"
@@ -113,4 +130,15 @@ describe Statement do
       @results.length.must_equal 10
       @results.first.must_equal expected_result
   end
+
+  it "scrapes Rand Paul's first page of press releases" do
+    @rand_paul = "http://www.paul.senate.gov/news/press?PageNum_rs=1"
+    WebMock.stub_request(:any, @rand_paul).to_return(:body => File.new(File.join(File.dirname(__FILE__), 'rand_paul_press.html')), :status => 200)
+    @results = Scraper.rand_paul(page = 1)
+    @results.length.must_equal 20
+    @results[0][:url].must_equal 'http://www.paul.senate.gov/news/press/sens-rand-paul-and-mark-warner-introduce-the-bonuses-for-cost-cutters-act-of-2015'
+    @results[0][:title].must_equal 'Sens. Rand Paul & Mark Warner Introduce the Bonuses for Cost-Cutters Act of 2015'
+  end
+
+
 end
