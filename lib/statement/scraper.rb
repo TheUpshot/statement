@@ -437,6 +437,32 @@ module Statement
       results
     end
 
+
+    def self.patrick_meehan(page = 0)
+      # This is a Drupal page and it uses the View plugin, but unlike the other
+      # Drupal pages, it does not make use of .views-field-created, and instead, the
+      # only Month-Year is given (03 Feb).
+      page_url = "https://meehan.house.gov/media-center/press-releases?page=#{page}"
+      doc = open_html(page_url)
+      return if doc.nil?
+      results = doc.search('.view-congress-press-releases .views-row').inject([]) do |arr, article|
+        title = article.search('.views-field-title a')[0]
+        article_url = URI.join(page_url, title['href'])
+        raise "Date still needs to be parsed; thanks a lot Drupal"
+        article_datestr = title.previous_element.text
+        arr << {
+          :source => page_url,
+          :url => article_url.to_s,
+          :domain => article_url.host,
+          :title => title.text,
+          :date => Date.strptime(article_datestr, 'SOMETHING')
+        }
+      end
+
+      results
+    end
+
+
     # fetches the latest 1000 releases, can be altered
     def self.lautenberg(rows=1000)
       results = []
