@@ -933,7 +933,8 @@ module Statement
             "https://bilirakis.house.gov/press-releases",
             "http://quigley.house.gov/media-center/press-releases",
             "https://denham.house.gov/media-center/press-releases",
-            "https://sewell.house.gov/media-center/press-releases"
+            "https://sewell.house.gov/media-center/press-releases",
+            "https://buchanan.house.gov/media-center/press-releases"
         ]
       end
 
