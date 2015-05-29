@@ -857,24 +857,36 @@ module Statement
       results
     end
 
-    def self.backfill_bilirakis
+    def self.backfill_bilirakis(page=1)
       results = []
       domain = 'bilirakis.house.gov'
-      url = 'http://bilirakis.house.gov/press-releases/'
+      url = "https://bilirakis.house.gov/press-releases?page=#{page}"
       doc = open_html(url)
       return if doc.nil?
-      doc.css("ul li[@class='article articleright']").each do |row|
-        results << {:source => url, :url => 'http://bilirakis.house.gov' + row.children[3].children[1]['href'], :title => row.children[3].text.strip, :date => Date.parse(row.children[5].text), :domain => domain }
+      doc.css("#region-content .views-row").each do |row|
+          title_anchor = row.css("h3 a")
+          title = title_anchor.text
+          release_url = "http://#{domain + title_anchor.attr('href')}"
+            raw_date = row.css(".views-field-created").text
+          results << { :source => url,
+                       :url => release_url,
+                       :title => title,
+                       :date => begin Date.parse(raw_date) rescue nil end,
+                       :domain => domain }
       end
+      results
     end
 
-    def self.backfill_boustany
+    def self.backfill_boustany(congress)
       results = []
       domain = 'boustany.house.gov'
-      url = 'http://boustany.house.gov/113th-congress/showallitems/'
+      url = "http://boustany.house.gov/#{congress}th-congress/showallitems/"
       doc = open_html(url)
       return if doc.nil?
-
+      (doc/:ul)[13].search(:li).each do |row|
+        results << {:source => url, :url => 'http://boustany.house.gov' + row.children.search(:a)[0]['href'], :title => row.children.search(:a)[0].text, :date => Date.parse(row.children[5].text), :domain => domain }
+      end
+      results
     end
 
     def self.perlmutter
