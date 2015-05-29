@@ -934,7 +934,8 @@ module Statement
             "http://quigley.house.gov/media-center/press-releases",
             "https://denham.house.gov/media-center/press-releases",
             "https://sewell.house.gov/media-center/press-releases",
-            "https://buchanan.house.gov/media-center/press-releases"
+            "https://buchanan.house.gov/media-center/press-releases",
+            "https://meehan.house.gov/media-center/press-releases"
         ]
       end
 
