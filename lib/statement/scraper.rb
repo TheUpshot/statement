@@ -29,7 +29,7 @@ module Statement
     end
 
     def self.member_methods
-      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :freshman_senators, :klobuchar, :billnelson, :crapo, :boxer,
+      [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :klobuchar, :billnelson, :crapo, :boxer,
       :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
       :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :lamborn, :walden, :boehner,
       :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin_burr, :rand_paul]
@@ -742,7 +742,8 @@ module Statement
         {"grothman.house.gov" => 27},
         {"beyer.house.gov" => 27},
         {"kathleenrice.house.gov" => 27},
-        {"hanna.house.gov" => 27}
+        {"hanna.house.gov" => 27},
+        {"trentkelly.house.gov" => 27}
       ]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
