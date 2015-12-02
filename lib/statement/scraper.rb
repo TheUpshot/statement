@@ -743,7 +743,8 @@ module Statement
         {"beyer.house.gov" => 27},
         {"kathleenrice.house.gov" => 27},
         {"hanna.house.gov" => 27},
-        {"trentkelly.house.gov" => 27}
+        {"trentkelly.house.gov" => 27},
+        {"lamborn.house.gov" => 27}
       ]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
