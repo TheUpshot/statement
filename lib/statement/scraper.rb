@@ -30,8 +30,8 @@ module Statement
 
     def self.member_methods
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :klobuchar, :billnelson, :crapo, :boxer, :burr, :ellison,
-      :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton,
-      :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :walden, :cassidy, :lowey,
+      :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :schiff,
+      :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :walden, :cassidy, :lowey, :mcmorris,
       :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin, :rand_paul]
     end
 
@@ -44,7 +44,7 @@ module Statement
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), billnelson(page=0), ellison,
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0), burr, cassidy,
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
-        sessions(year=year), gabbard, costa, farr, olson, schumer, walden, bennie_thompson, speier, lowey,
+        sessions(year=year), gabbard, costa, farr, olson, schumer, walden, bennie_thompson, speier, lowey, mcmorris, schiff,
         poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins, durbin(page=1),
         rand_paul(page = 1)].flatten
       results = results.compact
@@ -57,7 +57,7 @@ module Statement
         vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot_grisham(page=2),
         sessions(year=2013), pryor(page=1), farr(year=2013), farr(year=2012), farr(year=2011), cassidy(page=2), cassidy(page=3),
         olson(year=2013), schumer(page=2), schumer(page=3), poe(year=2015, month=2), ellison(page=1), ellison(page=2), lowey(page=1),
-        lowey(page=2), lowey(page=3), poe(year=2015, month=1)].flatten
+        lowey(page=2), lowey(page=3), poe(year=2015, month=1), mcmorris(page=2), mcmorris(page=3), schiff(page=2), schiff(page=3)].flatten
       Utils.remove_generic_urls!(results)
     end
 
@@ -352,6 +352,17 @@ module Statement
       results
     end
 
+    def self.mcmorris(page=1)
+      results = []
+      url = "http://mcmorris.house.gov/issues/page/#{page}/?tax=types&term=news_releases"
+      doc = open_html(url)
+      return if doc.nil?
+      doc.css(".feed-result").each do |row|
+        results << { :source => url, :url => row.children[3].children[3].children.first['href'], :title => row.children[3].children[3].children.first.text.strip, :date => Date.parse(row.children[3].children[1].text), :domain => "mcmorris.house.gov" }
+      end
+      results
+    end
+
     def self.klobuchar(year)
       results = []
       base_url = "http://www.klobuchar.senate.gov/"
@@ -448,6 +459,29 @@ module Statement
       results
     end
 
+    def self.schiff(page=1)
+      results = []
+      url = "http://schiff.house.gov/news/press-releases?PageNum_rs=#{page}&"
+      doc = open_html(url)
+      return if doc.nil?
+      rows = doc.css("#press").first.css('h2')
+      rows.each do |row|
+        results << { :source => url, :url => "http://schiff.house.gov" + row.children.first['href'], :title => row.children.last.text.strip, :date => Date.strptime(row.previous.previous.text, "%m.%d.%y"), :domain => "schiff.house.gov" }
+      end
+      results
+    end
+
+    def self.speier
+      results = []
+      url = "http://speier.house.gov/index.php?option=com_content&view=category&id=20&Itemid=14"
+      doc = open_html(url)
+      return if doc.nil?
+      rows = doc.css("table.category tr")
+      rows.each do |row|
+        results << { :source => url, :url => "http://speier.house.gov" + row.children[1].children[1]['href'], :title => row.children[1].children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => "speier.house.gov" }
+      end
+      results
+    end
 
     def self.burr(page=1)
       results = []
@@ -848,18 +882,6 @@ module Statement
       results
     end
 
-    def self.speier
-      results = []
-      domain = "speier.house.gov"
-      url = "http://speier.house.gov/index.php?option=com_content&view=category&id=20&Itemid=14"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath('//*[@id="adminForm"]/table/tbody/tr').each do |row|
-        results << {:source => url, :url => 'http://speier.house.gov' + row.children[1].children[1]['href'], :title => row.children[1].children[1].text.strip, :date => Date.parse(row.children[3].text.strip), :domain => domain }
-      end
-      results
-    end
-
     def self.backfill_bilirakis(page=1)
       results = []
       domain = 'bilirakis.house.gov'
@@ -938,7 +960,9 @@ module Statement
             "https://denham.house.gov/media-center/press-releases",
             "https://sewell.house.gov/media-center/press-releases",
             "https://buchanan.house.gov/media-center/press-releases",
-            "https://meehan.house.gov/media-center/press-releases"
+            "https://meehan.house.gov/media-center/press-releases",
+            "https://olson.house.gov/media-center/press-releases",
+            "https://louise.house.gov/media-center/press-releases"
         ]
       end
 
