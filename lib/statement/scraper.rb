@@ -31,7 +31,7 @@ module Statement
     def self.member_methods
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :klobuchar, :billnelson, :crapo, :boxer, :burr, :ellison,
       :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :schiff,
-      :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :walden, :cassidy, :lowey, :mcmorris,
+      :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :cassidy, :lowey, :mcmorris, :takano,
       :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin, :rand_paul]
     end
 
@@ -44,7 +44,7 @@ module Statement
       results = [crenshaw, capuano, cold_fusion(year, nil), conaway, chabot, klobuchar(year), billnelson(page=0), ellison,
         document_query(page=1), document_query(page=2), swalwell(page=1), crapo, boxer, grassley(page=0), burr, cassidy,
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
-        sessions(year=year), gabbard, costa, farr, olson, schumer, walden, bennie_thompson, speier, lowey, mcmorris, schiff,
+        sessions(year=year), gabbard, costa, farr, olson, schumer, bennie_thompson, speier, lowey, mcmorris, schiff, takano,
         poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins, durbin(page=1),
         rand_paul(page = 1)].flatten
       results = results.compact
@@ -57,7 +57,8 @@ module Statement
         vitter(year=2012), vitter(year=2011), swalwell(page=2), swalwell(page=3), clark(year=2013), culberson_chabot_grisham(page=2),
         sessions(year=2013), pryor(page=1), farr(year=2013), farr(year=2012), farr(year=2011), cassidy(page=2), cassidy(page=3),
         olson(year=2013), schumer(page=2), schumer(page=3), poe(year=2015, month=2), ellison(page=1), ellison(page=2), lowey(page=1),
-        lowey(page=2), lowey(page=3), poe(year=2015, month=1), mcmorris(page=2), mcmorris(page=3), schiff(page=2), schiff(page=3)].flatten
+        lowey(page=2), lowey(page=3), poe(year=2015, month=1), mcmorris(page=2), mcmorris(page=3), schiff(page=2), schiff(page=3),
+        takano(page=2), takano(page=3)].flatten
       Utils.remove_generic_urls!(results)
     end
 
@@ -471,6 +472,18 @@ module Statement
       results
     end
 
+    def self.takano(page=1)
+      results = []
+      url = "http://takano.house.gov/newsroom/press-releases?PageNum_rs=#{page}"
+      doc = open_html(url)
+      return if doc.nil?
+      rows = doc.css("#press").first.css('h2')
+      rows.each do |row|
+        results << { :source => url, :url => "http://takano.house.gov" + row.children.first['href'], :title => row.children.last.text.strip, :date => Date.strptime(row.previous.previous.text, "%m.%d.%y"), :domain => "takano.house.gov" }
+      end
+      results
+    end
+
     def self.speier
       results = []
       url = "http://speier.house.gov/index.php?option=com_content&view=category&id=20&Itemid=14"
@@ -599,7 +612,7 @@ module Statement
       doc = open_html(url)
       return if doc.nil?
       doc.xpath("//div[@id='press']//h2").each do |row|
-        results << { :source => url, :url => "http://www.durbin.senate.gov"+row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.previous.previous.text.gsub(".","/")), :domain => domain}
+        results << { :source => url, :url => "http://www.durbin.senate.gov"+row.children[0]['href'], :title => row.children[0].text.strip, :date => Date.parse(row.previous.previous.text.gsub(".","/")), :domain => 'www.durbin.senate.gov'}
       end
       results
     end
@@ -770,7 +783,7 @@ module Statement
         {"clawson.house.gov" => 2641},
         {"palazzo.house.gov" => 2519},
         {"roe.house.gov" => 1532},
-        {"perry.house.gov" => 2608},
+        {"perry.house.gov" => 2607},
         {"rodneydavis.house.gov" => 2427},
         {"kevinbrady.house.gov" => 2657},
         {"loudermilk.house.gov" => 27},
@@ -784,7 +797,11 @@ module Statement
         {"kathleenrice.house.gov" => 27},
         {"hanna.house.gov" => 27},
         {"trentkelly.house.gov" => 27},
-        {"lamborn.house.gov" => 27}
+        {"lamborn.house.gov" => 27},
+        {"wittman.house.gov" => 2670},
+        {"kinzinger.house.gov" => 2665},
+        {"ellmers.house.gov" => 27},
+        {"frankel.house.gov" => 27}
       ]
       domains.each do |domain|
         doc = open_html("http://"+domain.keys.first+"/news/documentquery.aspx?DocumentTypeID=#{domain.values.first}&Page=#{page}")
@@ -842,18 +859,6 @@ module Statement
       return if doc.nil?
       doc.xpath("//ul[@class='sectionitems']//li").each do |row|
         results << {:source => url, :url => 'http://lynnjenkins.house.gov' + row.children[3].children[1]['href'], :title => row.children[3].text.strip, :date => Date.parse(row.children[5].text), :domain => domain }
-      end
-      results
-    end
-
-    def self.walden
-      results = []
-      domain = 'walden.house.gov'
-      url = "http://walden.house.gov/s2015/"
-      doc = open_html(url)
-      return if doc.nil?
-      doc.xpath('//*[@id="centerbox"]/div[1]/ul/li').each do |row|
-        results << {:source => url, :url => 'http://walden.house.gov' + row.children[3].children[1]['href'], :title => row.children[3].text.strip, :date => Date.parse(row.children[5].text), :domain => domain }
       end
       results
     end
@@ -953,7 +958,6 @@ module Statement
             "http://butterfield.house.gov/media-center/press-releases",
             "http://walz.house.gov/media-center/press-releases",
             "https://pingree.house.gov/media-center/press-releases",
-            "http://sarbanes.house.gov/media-center/press-releases",
             "http://wilson.house.gov/media-center/press-releases",
             "https://bilirakis.house.gov/press-releases",
             "http://quigley.house.gov/media-center/press-releases",
@@ -962,7 +966,11 @@ module Statement
             "https://buchanan.house.gov/media-center/press-releases",
             "https://meehan.house.gov/media-center/press-releases",
             "https://olson.house.gov/media-center/press-releases",
-            "https://louise.house.gov/media-center/press-releases"
+            "https://louise.house.gov/media-center/press-releases",
+            "https://waters.house.gov/media-center/press-releases",
+            "https://walden.house.gov/media-center/press-releases",
+            "https://brooks.house.gov/media-center/news-releases",
+            "https://swalwell.house.gov/media-center/press-releases"
         ]
       end
 
