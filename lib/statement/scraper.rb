@@ -32,7 +32,7 @@ module Statement
       [:crenshaw, :capuano, :cold_fusion, :conaway, :chabot, :klobuchar, :billnelson, :crapo, :boxer, :burr, :ellison,
       :vitter, :inhofe, :document_query, :swalwell, :fischer, :clark, :edwards, :culberson_chabot_grisham, :barton, :schiff,
       :welch, :sessions, :gabbard, :costa, :farr, :mcclintock, :olson, :schumer, :cassidy, :lowey, :mcmorris, :takano,
-      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin, :rand_paul]
+      :bennie_thompson, :speier, :poe, :grassley, :bennet, :shaheen, :keating, :drupal, :jenkins, :durbin, :rand_paul, :senate_drupal]
     end
 
     def self.committee_methods
@@ -46,7 +46,7 @@ module Statement
         vitter(year=year), inhofe(year=year), fischer, clark(year=year), edwards, culberson_chabot_grisham(page=1), barton, welch,
         sessions(year=year), gabbard, costa, farr, olson, schumer, bennie_thompson, speier, lowey, mcmorris, schiff, takano,
         poe(year=year, month=0), bennet(page=1), shaheen(page=1), perlmutter, keating, drupal, jenkins, durbin(page=1),
-        rand_paul(page = 1)].flatten
+        rand_paul(page = 1), senate_drupal].flatten
       results = results.compact
       Utils.remove_generic_urls!(results)
     end
@@ -289,7 +289,7 @@ module Statement
     def self.cold_fusion(year=Date.today.year, month=nil, skip_domains=[])
       results = []
       year = Date.today.year if not year
-      domains = ['www.ronjohnson.senate.gov','www.risch.senate.gov', 'www.lee.senate.gov', 'www.barrasso.senate.gov', 'www.heitkamp.senate.gov']
+      domains = ['www.ronjohnson.senate.gov','www.risch.senate.gov', 'www.lee.senate.gov', 'www.barrasso.senate.gov', 'www.heitkamp.senate.gov', 'www.shelby.senate.gov', 'www.tillis.senate.gov']
       domains = domains - skip_domains if skip_domains
       domains.each do |domain|
         if domain == 'www.risch.senate.gov'
@@ -297,6 +297,18 @@ module Statement
             url = "http://www.risch.senate.gov/public/index.cfm/pressreleases"
           else
             url = "http://www.risch.senate.gov/public/index.cfm/pressreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
+          end
+        elsif domain == 'www.tillis.senate.gov'
+          if not month
+            url = "http://www.tillis.senate.gov/public/index.cfm/press-releases"
+          else
+            url = "http://www.tillis.senate.gov/public/index.cfm/press-releases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
+          end
+        elsif domain == 'www.shelby.senate.gov'
+          if not month
+            url = "http://www.shelby.senate.gov/public/index.cfm/newsreleases"
+          else
+            url = "http://www.shelby.senate.gov/public/index.cfm/newsreleases?YearDisplay=#{year}&MonthDisplay=#{month}&page=1"
           end
         elsif domain == 'www.barrasso.senate.gov'
           if not month
@@ -313,7 +325,7 @@ module Statement
         end
         doc = Statement::Scraper.open_html(url)
         return if doc.nil?
-        if domain == 'www.lee.senate.gov' or domain == 'www.barrasso.senate.gov' or domain == "www.heitkamp.senate.gov"
+        if domain == 'www.lee.senate.gov' or domain == 'www.barrasso.senate.gov' or domain == "www.heitkamp.senate.gov" or domain == 'www.tillis.senate.gov'
           rows = doc.xpath("//tr")[1..-1]
         else
           rows = doc.xpath("//tr")[2..-1]
@@ -322,7 +334,8 @@ module Statement
           date_text, title = row.children.map{|c| c.text.strip}.reject{|c| c.empty?}
           next if date_text == 'Date' or date_text.size > 10
           date = Date.parse(date_text)
-          results << { :source => url, :url => row.children[3].children.first['href'], :title => title, :date => date, :domain => domain }
+          url = row.children[3].children.first['href'].chars.first == '/' ? "http://#{domain}"+row.children[3].children.first['href'] : row.children[3].children.first['href']
+          results << { :source => url, :url => url, :title => title, :date => date, :domain => domain }
         end
       end
       results.flatten
@@ -1006,6 +1019,42 @@ module Statement
       results
     end
 
+    def self.senate_drupal(urls=[], page=0)
+      if urls.empty?
+        urls = [
+          "http://www.durbin.senate.gov/newsroom/press-releases",
+          "http://www.capito.senate.gov/news/press-releases",
+          "http://www.perdue.senate.gov/news/press-releases",
+          "http://www.daines.senate.gov/news/press-releases",
+          "http://www.gardner.senate.gov/newsroom/press-releases",
+          "http://www.leahy.senate.gov/press/releases",
+          "http://www.paul.senate.gov/news/press"
+        ]
+      end
+
+      results = []
+
+      urls.each do |url|
+        source_url = "#{url}?page=#{page}"
+
+        domain =  URI.parse(source_url).host
+        doc = open_html(source_url)
+        return if doc.nil?
+
+        doc.css("#newscontent h2").each do |row|
+            title = row.text.strip
+            release_url = "http://#{domain + row.css('a').first['href']}"
+              raw_date = row.previous.previous.text
+            results << { :source => source_url,
+                         :url => release_url,
+                         :title => title,
+                         :date => begin Date.strptime(raw_date, "%m.%d.%y") rescue nil end,
+                         :domain => domain }
+        end
+      end
+      results
+
+    end
   end
 
 end
